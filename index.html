@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Triangles Tell the Truth</title>
+<meta name="description" content="Geometry in the World — a two-person math midterm: the shape of the universe and the geometry of Nepal's flag.">
+<style>
+/* ============ THEME TOKENS ============ */
+:root{
+  --bg:#f6f4ef; --bg2:#ffffff; --ink:#1a1d27; --muted:#5d6373; --line:#e2ddd2;
+  --card:#ffffff; --accent:#3d4fd6; --accent-soft:rgba(61,79,214,.10);
+  --crimson:#DC143C; --blue:#003893; --navy:#0a0f2c; --gold:#f2b705;
+  --radius:18px; --shadow:0 10px 30px rgba(20,24,40,.08);
+  --serif:"Cambria Math","Cambria","Georgia","Times New Roman",serif;
+  --sans:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+body[data-route="rojan"]{
+  --bg:#060a1e; --bg2:#0b1230; --ink:#e7ebff; --muted:#9ba5cc; --line:#223064;
+  --card:#0e1638; --accent:#7fa6ff; --accent-soft:rgba(127,166,255,.12);
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+}
+body[data-route="sanskrit"]{ --bg:#fbf7f5; --accent:#DC143C; --accent-soft:rgba(220,20,60,.08); }
+body[data-route="connection"]{ --bg:#f4f3fa; --accent:#5a3fc0; --accent-soft:rgba(90,63,192,.09); }
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.65 var(--sans);
+  transition:background-color .5s ease,color .5s ease;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3,h4{line-height:1.2;margin:0 0 .5em}
+h2{font-size:clamp(1.5rem,3.4vw,2.1rem)}
+h3{font-size:1.25rem;margin-top:1.6em}
+p{margin:0 0 1em}
+a{color:var(--accent)}
+button{font:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+
+/* ============ NAV ============ */
+.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:14px;min-height:60px;flex-wrap:wrap}
+.brand{font-weight:800;letter-spacing:-.01em;text-decoration:none;color:var(--ink);display:flex;align-items:center;gap:8px;margin-right:auto}
+.brand svg{flex:none}
+.navlinks{display:flex;gap:4px;flex-wrap:wrap}
+.navlinks a{text-decoration:none;color:var(--muted);padding:7px 12px;border-radius:999px;font-size:.92rem;font-weight:600;transition:.2s}
+.navlinks a:hover{color:var(--ink);background:var(--accent-soft)}
+.navlinks a.active{color:#fff;background:var(--accent)}
+body[data-route="rojan"] .navlinks a.active{color:#060a1e}
+
+/* ============ VIEWS ============ */
+.view{display:none}
+.view.active{display:block;animation:viewIn .55s cubic-bezier(.2,.7,.2,1)}
+@keyframes viewIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ============ HOME ============ */
+.home-hero{padding:70px 0 30px;text-align:center;position:relative}
+.home-hero h1{font-size:clamp(2rem,5.6vw,3.6rem);letter-spacing:-.02em;max-width:900px;margin:0 auto .4em}
+.home-hero h1 .t1{color:var(--crimson)} .home-hero h1 .t2{color:#2a3a9a}
+.home-hero .lead{max-width:680px;margin:0 auto;font-size:1.12rem;color:var(--muted)}
+.kicker{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);background:var(--accent-soft);padding:6px 12px;border-radius:999px;margin-bottom:18px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:40px 0 24px}
+.bigcard{position:relative;overflow:hidden;border-radius:26px;min-height:360px;padding:30px;color:#fff;text-decoration:none;
+  display:flex;flex-direction:column;justify-content:flex-end;box-shadow:0 18px 40px rgba(10,15,44,.22);transition:transform .35s,box-shadow .35s}
+.bigcard:hover{transform:translateY(-6px);box-shadow:0 26px 50px rgba(10,15,44,.3)}
+.bigcard .who{font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700;opacity:.85}
+.bigcard h2{font-size:clamp(1.5rem,3vw,2rem);margin:.25em 0 .35em}
+.bigcard p{opacity:.9;margin:0 0 14px;max-width:420px}
+.bigcard .go{font-weight:700;display:inline-flex;gap:8px;align-items:center}
+.bigcard .art{position:absolute;inset:0;pointer-events:none}
+.bigcard > *:not(.art){position:relative}
+.card-rojan{background:radial-gradient(120% 90% at 80% 10%,#1d2a6b 0%,#0a0f2c 55%,#05071a 100%)}
+.card-sanskrit{background:linear-gradient(150deg,#DC143C 0%,#b10f30 50%,#003893 100%)}
+.connect-btn{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 auto 60px;max-width:460px;padding:16px 24px;
+  border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--ink);text-decoration:none;font-weight:700;
+  box-shadow:var(--shadow);transition:.3s}
+.connect-btn:hover{transform:translateY(-3px);border-color:var(--accent)}
+.home-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:60px}
+.home-strip div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.home-strip b{display:block;font-size:1.6rem;font-family:var(--serif)}
+
+/* ============ TOPIC PAGES ============ */
+.hero{position:relative;overflow:hidden;padding:64px 0 48px}
+.hero .wrap{position:relative}
+.hero h1{font-size:clamp(2rem,5.4vw,3.3rem);letter-spacing:-.02em;margin-bottom:.3em}
+.hero .lead{font-size:1.15rem;max-width:720px;opacity:.9}
+.hero-rojan{background:radial-gradient(110% 120% at 85% 0%,#20307a 0%,#0a0f2c 50%,#060a1e 100%);color:#fff}
+.hero-sanskrit{background:linear-gradient(135deg,#DC143C 0%,#a80f2f 55%,#003893 100%);color:#fff}
+.hero-connection{background:linear-gradient(120deg,#0a0f2c 0%,#3a2a8a 45%,#DC143C 100%);color:#fff}
+.starfield{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.backbtn{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.4);
+  color:#fff;background:rgba(255,255,255,.08);cursor:pointer;font-weight:600;font-size:.9rem;margin-bottom:22px;transition:.2s}
+.backbtn:hover{background:rgba(255,255,255,.2)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.chip{border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:7px 14px;cursor:pointer;font-weight:600;font-size:.9rem}
+.chip:hover{background:rgba(255,255,255,.25)}
+
+.section{padding:56px 0;border-bottom:1px solid var(--line)}
+.section:last-of-type{border-bottom:0}
+.sec-head{display:flex;align-items:center;gap:16px;margin-bottom:22px}
+.sec-num{flex:none;width:58px;height:58px;border-radius:16px;display:grid;place-items:center;font-weight:800;font-size:1.5rem;
+  background:var(--accent);color:#fff}
+body[data-route="rojan"] .sec-num{color:#060a1e}
+.sec-head .lbl{font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.sec-head h2{margin:0}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
+.panel h3:first-child,.panel h4:first-child{margin-top:0}
+.hook{font-family:var(--serif);font-size:clamp(1.3rem,2.8vw,1.8rem);line-height:1.35;padding:26px 30px;border-left:5px solid var(--accent);
+  background:var(--accent-soft);border-radius:0 var(--radius) var(--radius) 0;margin:0 0 24px;font-style:italic}
+.callout{border-radius:14px;padding:16px 18px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);margin:18px 0}
+.callout b:first-child{color:var(--accent)}
+.insight{border-radius:16px;padding:20px 22px;margin:22px 0;background:linear-gradient(135deg,rgba(242,183,5,.16),rgba(242,183,5,.04));border:1px solid rgba(242,183,5,.5)}
+.insight::before{content:"💡 I never saw it that way before";display:block;font-size:.75rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#b07f00;margin-bottom:6px}
+body[data-route="rojan"] .insight::before{color:#f2c94c}
+
+.formula{font-family:var(--serif);font-size:clamp(1.15rem,2.6vw,1.5rem);text-align:center;padding:20px 14px;margin:18px 0;border-radius:14px;
+  background:var(--bg2);border:1px solid var(--line);overflow-x:auto}
+.formula .cap{display:block;font-family:var(--sans);font-size:.78rem;color:var(--muted);margin-top:8px;letter-spacing:.04em}
+.m{font-family:var(--serif);font-style:italic}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 .15em;font-size:.92em}
+.frac>span:first-child{border-bottom:1.5px solid currentColor;padding:0 .2em}
+.frac>span:last-child{padding:0 .2em}
+
+.tag{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);vertical-align:middle}
+.verify{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:1px 7px;border-radius:6px;
+  background:#fff3cd;color:#8a6100;border:1px solid #f0d27a;vertical-align:middle;cursor:help;white-space:nowrap}
+.todo{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:1px 7px;border-radius:6px;
+  background:#e7f0ff;color:#2850a8;border:1px solid #a9c2f2;vertical-align:middle;white-space:nowrap}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--line);margin:16px 0}
+table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--card)}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--bg2)}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--serif);font-variant-numeric:tabular-nums}
+.results input{width:72px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+.verdict{font-weight:800}
+.v-gt{color:#e0506b} .v-eq{color:#2f9e6a} .v-lt{color:#4b7bec}
+
+/* interactive widgets */
+.widget{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--shadow);margin:26px 0}
+.widget-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.widget-head h3{margin:0}
+.widget svg{width:100%;height:auto;display:block}
+#curvSvg{max-width:560px;margin:0 auto}
+.controls{display:grid;gap:14px;margin-top:14px}
+.range-row label{display:flex;justify-content:space-between;font-size:.88rem;font-weight:600;color:var(--muted);margin-bottom:4px}
+input[type=range]{width:100%;accent-color:var(--accent);height:28px}
+.range-ends{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-top:-4px}
+.readout{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.readout div{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.readout small{display:block;font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.readout b{font-family:var(--serif);font-size:1.35rem}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--bg2);flex-wrap:wrap}
+.seg button{border:0;background:transparent;color:var(--muted);padding:6px 14px;border-radius:999px;cursor:pointer;font-weight:600;font-size:.88rem}
+.seg button.on{background:var(--accent);color:#fff}
+body[data-route="rojan"] .seg button.on{color:#060a1e}
+.btn{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:10px 18px;font-weight:700;cursor:pointer;
+  background:var(--accent);color:#fff;transition:.2s}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.stepper-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+.stepper-bar .count{font-weight:800;font-variant-numeric:tabular-nums;margin:0 auto 0 4px}
+.progress{height:6px;border-radius:6px;background:var(--line);overflow:hidden;margin-top:12px}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .35s}
+.caption{min-height:120px;margin-top:14px;padding:16px 18px;border-radius:14px;background:var(--bg2);border:1px solid var(--line)}
+.caption h4{margin:0 0 6px;color:var(--accent)}
+.caption p{margin:0}
+.stepper-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;align-items:start}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:.88rem;font-weight:600;color:var(--muted);cursor:pointer}
+
+/* photo placeholders */
+.ph{border:2px dashed color-mix(in srgb,var(--accent) 55%,transparent);border-radius:16px;aspect-ratio:4/3;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;padding:16px;color:var(--muted);background:var(--accent-soft);font-size:.88rem}
+.ph svg{margin-bottom:8px;opacity:.75}
+.ph b{color:var(--ink)}
+.ph code{font-size:.75rem;background:var(--bg2);padding:2px 6px;border-radius:6px;margin-top:6px}
+
+/* lists */
+.steps-list{counter-reset:s;list-style:none;padding:0;margin:0}
+.steps-list li{counter-increment:s;position:relative;padding:10px 0 10px 46px;border-bottom:1px dashed var(--line)}
+.steps-list li::before{content:"(" counter(s,lower-alpha) ")";position:absolute;left:0;top:10px;font-family:var(--serif);font-weight:700;color:var(--accent)}
+.steps-list.numeric li::before{content:counter(s) "."}
+
+details{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin:14px 0}
+summary{cursor:pointer;font-weight:700;color:var(--accent)}
+
+.reflect{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.reflect .panel h4{color:var(--accent);margin-bottom:8px}
+
+.mindset{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.mindset .panel{text-align:left}
+.mindset .ico{font-size:1.8rem}
+
+.backhome{margin:30px 0 0}
+
+/* footer */
+footer{background:#0a0f2c;color:#c9cfe8;padding:34px 0;margin-top:0;font-size:.92rem}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+footer b{color:#fff}
+footer .bar{height:4px;background:linear-gradient(90deg,#DC143C,#003893,#7fa6ff)}
+
+/* svg text */
+svg text{font-family:var(--sans)}
+.lbl-pt{font-size:12px;font-weight:700;fill:#1a1d27}
+.lbl-pt.cur{fill:#003893}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:860px){
+  .cards,.grid2,.stepper-grid{grid-template-columns:1fr}
+  .grid3,.reflect,.mindset,.home-strip{grid-template-columns:1fr}
+  .bigcard{min-height:300px}
+}
+@media (max-width:560px){
+  body{font-size:16px}
+  .wrap{padding:0 16px}
+  .nav .wrap{padding-top:8px;padding-bottom:8px}
+  .brand span{display:none}
+  .navlinks a{padding:6px 9px;font-size:.82rem}
+  .readout{grid-template-columns:1fr 1fr}
+  .hook{padding:18px 18px}
+  .panel,.widget{padding:16px}
+  .section{padding:40px 0}
+  .sec-num{width:46px;height:46px;font-size:1.2rem}
+}
+@media (prefers-reduced-motion:reduce){ .view.active{animation:none} html{scroll-behavior:auto} }
+</style>
+</head>
+<body data-route="home">
+
+<!-- ================= NAV ================= -->
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="#home" aria-label="Home">
+      <svg width="26" height="26" viewBox="0 0 26 26"><path d="M3 22 L13 3 L23 22 Z" fill="none" stroke="#DC143C" stroke-width="2.4" stroke-linejoin="round"/><path d="M3 22 Q13 14 23 22" fill="none" stroke="#3d4fd6" stroke-width="2"/></svg>
+      <span>Triangles Tell the Truth</span>
+    </a>
+    <div class="navlinks">
+      <a href="#home" data-r="home">Home</a>
+      <a href="#rojan" data-r="rojan">Universe</a>
+      <a href="#sanskrit" data-r="sanskrit">Nepal's Flag</a>
+      <a href="#connection" data-r="connection">Connection</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+<!-- =============================================================
+     HOME
+     ============================================================= -->
+<section class="view" id="view-home">
+  <div class="wrap">
+    <div class="home-hero">
+      <span class="kicker">Geometry in the World · Midterm Project</span>
+      <h1>Triangles Tell the Truth: <span class="t1">From Nepal's Flag</span> to <span class="t2">the Shape of the Universe</span></h1>
+      <p class="lead">A triangle looks like the simplest shape there is. But the rules that build one (straight lines, parallel lines, angles that add to 180°) carry a hidden claim about the space they're drawn in. One of us uses triangles to <em>build</em> a country's flag; the other uses them to <em>measure</em> the whole universe.</p>
+    </div>
+
+    <div class="cards">
+      <a class="bigcard card-rojan" href="#rojan">
+        <canvas class="art starfield" data-stars="140"></canvas>
+        <svg class="art" viewBox="0 0 400 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <circle cx="300" cy="110" r="70" fill="none" stroke="rgba(127,166,255,.35)" stroke-width="1.2"/>
+          <ellipse cx="300" cy="110" rx="70" ry="20" fill="none" stroke="rgba(127,166,255,.25)"/>
+          <path d="M300 40 Q262 92 246 118 Q300 132 352 118 Q338 92 300 40Z" fill="rgba(242,183,5,.25)" stroke="#f2c94c" stroke-width="1.6"/>
+        </svg>
+        <span class="who">Rojan</span>
+        <h2>What Shape Is the Universe?</h2>
+        <p>If you drew a triangle as big as the universe, would its angles still add up to 180°?</p>
+        <span class="go">Explore the cosmos →</span>
+      </a>
+      <a class="bigcard card-sanskrit" href="#sanskrit">
+        <svg class="art" viewBox="0 0 400 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <g id="homeFlag" transform="translate(300 22) scale(.55)"></g>
+        </svg>
+        <span class="who">Sanskrit</span>
+        <h2>The Geometry of Nepal's Flag</h2>
+        <p>The only national flag that isn't a rectangle, and its shape is written into the constitution as a compass-and-ruler construction.</p>
+        <span class="go">Build the flag →</span>
+      </a>
+    </div>
+
+    <a class="connect-btn" href="#connection">
+      <svg width="34" height="20" viewBox="0 0 34 20"><circle cx="9" cy="10" r="7" fill="none" stroke="#3d4fd6" stroke-width="2"/><circle cx="25" cy="10" r="7" fill="none" stroke="#DC143C" stroke-width="2"/></svg>
+      How Our Topics Connect
+    </a>
+
+    <div class="home-strip">
+      <div><b>180°</b><span class="muted small">The angle sum of a triangle, but only on a flat surface.</span></div>
+      <div><b>1.21901…</b><span class="muted small">Height ÷ width of Nepal's flag. An irrational number.</span></div>
+      <div><b>≈ 0</b><span class="muted small">The measured curvature of the universe (Planck satellite).</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================
+     ROJAN
+     ============================================================= -->
+<section class="view" id="view-rojan">
+  <header class="hero hero-rojan">
+    <canvas class="starfield" data-stars="220"></canvas>
+    <div class="wrap">
+      <button class="backbtn" data-home>← Back to Home</button>
+      <div class="kicker" style="background:rgba(127,166,255,.15);color:#a9c2ff">Rojan Dhungana</div>
+      <h1>What Shape Is the Universe?</h1>
+      <p class="lead">Astronomers answer this with a triangle. Not a small one, but a triangle stretched across most of the observable universe.</p>
+      <div class="chips">
+        <button class="chip" data-scroll="r-notice">1 · Notice + Name</button>
+        <button class="chip" data-scroll="r-explain">2 · Explain</button>
+        <button class="chip" data-scroll="r-create">3 · Create</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- 1 NOTICE -->
+    <section class="section" id="r-notice">
+      <div class="sec-head"><div class="sec-num">1</div><div><div class="lbl">Notice + Name</div><h2>A question bigger than the sky</h2></div></div>
+      <p class="hook">“If you drew a triangle as big as the universe, would its angles still add up to 180°?”</p>
+      <div class="grid2">
+        <div>
+          <p>In school we all learn that a triangle's angles add up to 180°. It's usually taught as a fact about triangles. But it's really a fact about the <strong>surface</strong> the triangle is drawn on. On a basketball the angles add to <em>more</em> than 180°. On a Pringle chip they add to <em>less</em>.</p>
+          <p>That caught my attention because it means a triangle can work as a <strong>measuring tool</strong>. Draw one, measure its angles, and you learn the shape of the space you're standing in, without ever seeing that space from the outside. Ants on a ball could work out that they live on a ball.</p>
+          <p>We live <em>inside</em> the universe and can never look at it from outside. Can we still find its shape? Yes, by drawing the biggest triangle possible.</p>
+          <p class="small muted"><span class="todo">Rojan: personalize</span> Add one or two sentences about where you first ran into this idea (a video, a class, a stargazing night) and why it stuck with you.</p>
+        </div>
+        <div class="panel">
+          <h4>Naming the pattern</h4>
+          <p class="small">The property we're measuring is called <strong>curvature</strong>. There are only three basic options for a uniform space:</p>
+          <div class="tbl-wrap"><table>
+            <tr><th>Space</th><th>Curvature</th><th>Angle sum</th></tr>
+            <tr><td>Flat (Euclidean)</td><td class="num">K = 0</td><td class="num">= 180°</td></tr>
+            <tr><td>Spherical (closed)</td><td class="num">K &gt; 0</td><td class="num">&gt; 180°</td></tr>
+            <tr><td>Hyperbolic / saddle (open)</td><td class="num">K &lt; 0</td><td class="num">&lt; 180°</td></tr>
+          </table></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 EXPLAIN -->
+    <section class="section" id="r-explain">
+      <div class="sec-head"><div class="sec-num">2</div><div><div class="lbl">Explain the Math</div><h2>Three geometries, one test</h2></div></div>
+
+      <div class="grid3">
+        <div class="panel">
+          <svg viewBox="0 0 200 130" aria-label="Flat triangle"><g stroke="rgba(127,166,255,.25)"><path d="M10 20H190M10 50H190M10 80H190M10 110H190M40 10V125M80 10V125M120 10V125M160 10V125"/></g><path d="M40 110 L100 22 L165 110Z" fill="rgba(127,166,255,.15)" stroke="#7fa6ff" stroke-width="2.5"/></svg>
+          <h4>Flat · Euclidean</h4>
+          <p class="small">Straight lines stay straight, parallel lines never meet. <span class="m">α+β+γ</span> = 180° exactly, whatever the size of the triangle.</p>
+        </div>
+        <div class="panel">
+          <svg viewBox="0 0 200 130" aria-label="Spherical triangle"><defs><radialGradient id="sg1" cx="35%" cy="30%"><stop offset="0" stop-color="#3b5bdb"/><stop offset="1" stop-color="#0b1230"/></radialGradient></defs><circle cx="100" cy="66" r="60" fill="url(#sg1)"/><path d="M58 98 Q100 0 100 14 Q100 0 142 98 Q100 118 58 98Z" fill="rgba(242,183,5,.22)" stroke="#f2c94c" stroke-width="2.5"/></svg>
+          <h4>Spherical · positive curvature</h4>
+          <p class="small">Like the surface of a ball. The sides bulge outward and the angles get bigger: <span class="m">α+β+γ</span> &gt; 180°. "Parallel" lines eventually meet, the way lines of longitude meet at the poles.</p>
+        </div>
+        <div class="panel">
+          <svg viewBox="0 0 200 130" aria-label="Saddle triangle"><g fill="none" stroke="rgba(224,80,107,.35)"><path d="M10 30 Q100 70 190 30"/><path d="M10 60 Q100 85 190 60"/><path d="M10 100 Q100 90 190 100"/><path d="M60 10 Q90 66 60 125"/><path d="M140 10 Q110 66 140 125"/></g><path d="M38 112 Q92 80 100 18 Q108 80 162 112 Q100 88 38 112Z" fill="rgba(224,80,107,.2)" stroke="#e0506b" stroke-width="2.5"/></svg>
+          <h4>Hyperbolic · negative curvature</h4>
+          <p class="small">Like a saddle or a Pringle. The sides pinch inward and the angles get smaller: <span class="m">α+β+γ</span> &lt; 180°. Parallel lines spread apart.</p>
+        </div>
+      </div>
+
+      <h3>Girard's theorem: the exact rule on a sphere</h3>
+      <p>On a sphere of radius <span class="m">R</span>, the amount by which a triangle beats 180° (its <strong>angle excess</strong>) depends only on its area:</p>
+      <div class="formula">
+        <span class="m">α</span> + <span class="m">β</span> + <span class="m">γ</span> = π + <span class="frac"><span class="m">Area</span><span class="m">R</span><sup>2</sup></span>
+        <span class="cap">angles in radians · excess <span class="m">E</span> = (α+β+γ) − π = Area / R² = <span class="m">K</span> · Area, where curvature <span class="m">K</span> = 1/R²</span>
+      </div>
+      <p>On a saddle-shaped (hyperbolic) surface with curvature <span class="m">K</span> = −1/R², the same rule gives a <strong>deficit</strong>:</p>
+      <div class="formula">
+        π − (<span class="m">α</span> + <span class="m">β</span> + <span class="m">γ</span>) = <span class="frac"><span class="m">Area</span><span class="m">R</span><sup>2</sup></span>
+        <span class="cap">so in every case: angle sum = 180° + K·Area (converted to degrees)</span>
+      </div>
+      <div class="insight">The bigger the triangle compared to the curvature, the bigger the error from 180°. A triangle on your desk drawn on the Earth's surface has an excess of about a billionth of a degree. That's why the Earth feels flat to us, and why testing the universe needs a <em>gigantic</em> triangle.</div>
+
+      <!-- INTERACTIVE -->
+      <div class="widget" id="curvWidget">
+        <div class="widget-head">
+          <h3>🔭 Interactive: bend space, watch the angles</h3>
+          <span class="tag">Drag the sliders</span>
+        </div>
+        <svg id="curvSvg" viewBox="0 0 400 330" role="img" aria-label="Triangle on a curved surface"></svg>
+        <div class="controls">
+          <div class="range-row">
+            <label for="kSlider"><span>Shape of space (curvature K)</span><span id="kName">Flat</span></label>
+            <input type="range" id="kSlider" min="-100" max="100" value="0" step="1">
+            <div class="range-ends"><span>◀ Saddle (K &lt; 0)</span><span>Flat (K = 0)</span><span>Sphere (K &gt; 0) ▶</span></div>
+          </div>
+          <div class="range-row">
+            <label for="sSlider"><span>Size of the triangle</span><span id="sName">Large</span></label>
+            <input type="range" id="sSlider" min="10" max="100" value="85" step="1">
+          </div>
+          <div class="seg" role="group" aria-label="Presets">
+            <button data-k="-100">Saddle</button><button data-k="0" class="on">Flat</button><button data-k="100">Sphere</button>
+          </div>
+        </div>
+        <div class="readout">
+          <div><small>Angle sum</small><b id="sumOut">180.0°</b></div>
+          <div><small>Each angle</small><b id="eachOut">60.0°</b></div>
+          <div><small>Excess K·A</small><b id="excOut">0.0°</b></div>
+        </div>
+        <p class="small muted" style="margin:12px 0 0">Model used: sum = 180° + K·A. The curved sides show what "straight" (shortest-path) lines look like when the space itself bends. Try a <em>small</em> triangle on a strongly curved surface: it still looks almost flat.</p>
+      </div>
+
+      <h3>Worked example: a triangle with three right angles</h3>
+      <div class="grid2">
+        <div class="panel" style="padding:12px">
+          <svg id="globeSvg" viewBox="0 0 320 300" role="img" aria-label="Octant triangle on a globe"></svg>
+        </div>
+        <div>
+          <p>Start at the <strong>North Pole</strong>. Walk straight down a line of longitude to the equator. Turn 90° and walk along the equator for a quarter of the way around the Earth (90° of longitude). Turn 90° again and walk straight back to the pole.</p>
+          <ul>
+            <li>At each equator corner, longitude lines meet the equator at <strong>90°</strong>.</li>
+            <li>At the pole, the two longitude lines are 90° apart, so that angle is also <strong>90°</strong>.</li>
+          </ul>
+          <div class="formula" style="font-size:1.2rem">90° + 90° + 90° = <strong>270°</strong></div>
+          <p><strong>Check with Girard:</strong> this triangle covers exactly ⅛ of the sphere's surface.</p>
+          <div class="formula" style="font-size:1.1rem">Area = <span class="frac"><span>4π<span class="m">R</span><sup>2</sup></span><span>8</span></span> = <span class="frac"><span>π<span class="m">R</span><sup>2</sup></span><span>2</span></span>
+          &nbsp;⇒&nbsp; <span class="m">E</span> = <span class="frac"><span>Area</span><span class="m">R</span><sup>2</sup></span> = <span class="frac"><span>π</span><span>2</span></span> = 90°<span class="cap">180° + 90° = 270° ✓ (the formula and the picture agree)</span></div>
+        </div>
+      </div>
+
+      <h3>How astronomers draw a triangle across the universe</h3>
+      <div class="grid2">
+        <div>
+          <p>The oldest light in the universe, the <strong>cosmic microwave background (CMB)</strong>, was released about 380,000 years after the Big Bang. It's covered in slightly hotter and colder spots.</p>
+          <p>Physics tells us the <strong>real size</strong> of the largest common spots: they match the farthest a pressure (sound) wave could travel in the young universe before the light was released. Measurements also tell us how <strong>far away</strong> that light comes from.</p>
+          <p>So we have a giant triangle: <strong>us</strong> at one corner and the two edges of a spot at the other two. We know the triangle's sides, so we can predict the angle at our corner if space is flat. Then we compare that prediction with the angle we actually <strong>see</strong> in the sky.</p>
+          <ul>
+            <li><strong>Sphere-like (closed):</strong> light paths bend outward → spots look <em>bigger</em> than 1°.</li>
+            <li><strong>Flat:</strong> spots look about <strong>1°</strong> wide (about twice the width of the full Moon).</li>
+            <li><strong>Saddle-like (open):</strong> light paths spread apart → spots look <em>smaller</em> than 1°.</li>
+          </ul>
+        </div>
+        <div class="widget" style="margin:0">
+          <div class="widget-head"><h3 style="font-size:1.05rem">The cosmic triangle</h3>
+            <div class="seg" id="cmbSeg"><button data-m="closed">Closed</button><button data-m="flat" class="on">Flat</button><button data-m="open">Open</button></div>
+          </div>
+          <svg id="cmbSvg" viewBox="0 0 400 330" role="img" aria-label="CMB triangle diagram"></svg>
+          <p class="small" id="cmbText" style="margin:10px 0 0"></p>
+        </div>
+      </div>
+      <div class="callout">
+        <b>The result.</b> The Planck satellite (ESA) measured the CMB spots at about 1°, just as a flat universe predicts. Combined with other data, Planck reports a curvature parameter of
+        <span class="m">Ω<sub>k</sub></span> = 0.0007 ± 0.0019 <span class="verify" title="Verify against the Planck 2018 results paper (Planck Collaboration 2020, A&A 641, A6)">verify</span>,
+        which is zero within the measurement error. As far as we can measure, <strong>the universe is flat</strong>, or so close to flat that a triangle billions of light-years across still adds up to 180°.
+      </div>
+    </section>
+
+    <!-- 3 CREATE -->
+    <section class="section" id="r-create">
+      <div class="sec-head"><div class="sec-num">3</div><div><div class="lbl">Create</div><h2>Three triangles, three universes</h2></div></div>
+      <p>To test Girard's idea myself, I drew triangles on three surfaces using the straightest lines I could (a string pulled tight works well on curved surfaces), then measured each angle with a protractor.</p>
+
+      <div class="grid3">
+        <div class="ph"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="4"/><path d="M8 6l1.5-2h5L16 6"/></svg><b>Photo: triangle on flat paper</b>Replace this box with your photo<code>&lt;img src="flat.jpg"&gt;</code></div>
+        <div class="ph"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="4"/><path d="M8 6l1.5-2h5L16 6"/></svg><b>Photo: triangle on a ball</b>Replace this box with your photo<code>&lt;img src="ball.jpg"&gt;</code></div>
+        <div class="ph"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="4"/><path d="M8 6l1.5-2h5L16 6"/></svg><b>Photo: triangle on a Pringle</b>Replace this box with your photo<code>&lt;img src="pringle.jpg"&gt;</code></div>
+      </div>
+
+      <h3>Results table</h3>
+      <p class="small muted">Type the measured angles in. The sum and the comparison update by themselves. <span class="todo">Rojan</span> To make your numbers permanent, put them in <code>ROJAN_MEASUREMENTS</code> near the bottom of this file.</p>
+      <div class="tbl-wrap"><table class="results">
+        <thead><tr><th>Surface</th><th>Prediction</th><th>∠A</th><th>∠B</th><th>∠C</th><th>Sum</th><th>vs 180°</th></tr></thead>
+        <tbody id="resBody"></tbody>
+      </table></div>
+      <p class="small muted">A protractor is only accurate to about ±1° per angle, so any sum within ±3° of 180° counts as "= 180°". Deciding how much error to allow is part of doing real measurement.</p>
+
+      <h3>Reflection</h3>
+      <div class="reflect">
+        <div class="panel"><h4>Choices I made</h4><p class="small">Three surfaces that match the three geometries: paper (flat), a ball (positive curvature), a Pringle (negative curvature). I made the triangles as <em>large</em> as each surface allowed, because Girard's theorem says bigger triangles show bigger effects.</p><p class="small"><span class="todo">Rojan: add</span> what size ball, how you drew the sides, anything that went wrong.</p></div>
+        <div class="panel"><h4>The math behind it</h4><p class="small">Angle sum = 180° + K·Area. On the ball, K = 1/R², so I can predict the excess from the ball's radius and the triangle's area, then check that prediction against my protractor.</p><p class="small"><span class="todo">Rojan: add</span> your predicted vs. measured excess for the ball.</p></div>
+        <div class="panel"><h4>What I want you to wonder</h4><p class="small">You've never seen the universe from the outside, and neither has anyone else. Yet with one triangle we can say it's flat. <strong>What else could you measure about something you're stuck inside?</strong> And if the universe <em>were</em> curved, where would a straight line you start today eventually end up?</p></div>
+      </div>
+      <div class="backhome"><button class="btn ghost" data-home>← Back to Home</button></div>
+    </section>
+  </div>
+</section>
+
+<!-- =============================================================
+     SANSKRIT
+     ============================================================= -->
+<section class="view" id="view-sanskrit">
+  <header class="hero hero-sanskrit">
+    <div class="wrap">
+      <button class="backbtn" data-home>← Back to Home</button>
+      <div class="kicker" style="background:rgba(255,255,255,.15);color:#fff">Sanskrit Adhikari</div>
+      <h1>The Geometry of Nepal's Flag</h1>
+      <p class="lead">Most countries describe their flag with colours and proportions. Nepal's constitution describes it as a <strong>compass-and-straightedge construction</strong>.</p>
+      <div class="chips">
+        <button class="chip" data-scroll="s-notice">1 · Notice + Name</button>
+        <button class="chip" data-scroll="s-explain">2 · Explain</button>
+        <button class="chip" data-scroll="s-create">3 · Create</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- 1 NOTICE -->
+    <section class="section" id="s-notice">
+      <div class="sec-head"><div class="sec-num">1</div><div><div class="lbl">Notice + Name</div><h2>The only flag that isn't a rectangle</h2></div></div>
+      <div class="grid2">
+        <div>
+          <p class="hook" style="font-size:1.35rem">Every national flag in the world is a rectangle, except one.</p>
+          <p>I'm from <strong>Bharatpur, Chitwan, Nepal</strong>. I grew up seeing our flag everywhere: on schools, at festivals, on the backs of buses. Two stacked crimson pennants with a blue border, a moon in the top one and a sun in the bottom. To me it was just <em>our flag</em>.</p>
+          <p>Then I learned something I had never noticed. The <strong>Constitution of Nepal (Schedule 1)</strong> <span class="verify" title="Check the exact Schedule number and article (Article 8 / Schedule-1 in the 2015 Constitution)">verify</span> doesn't give the flag's size as a picture or a ratio. It gives a <strong>numbered list of geometry instructions</strong>: draw this line, make it perpendicular, mark off this length, join these points. Our national flag is a geometry proof that anyone with a ruler and compass can rebuild exactly.</p>
+          <p><strong>Naming the pattern:</strong> the flag is built from <em>perpendiculars, parallel lines, equal lengths, and similar triangles</em>, the tools of Euclid's flat-plane geometry. And all those exact steps produce a height-to-width ratio that is an <strong>irrational number</strong>.</p>
+        </div>
+        <div class="panel" style="text-align:center">
+          <svg id="noticeFlag" viewBox="0 0 400 450" style="max-width:330px;margin:auto" role="img" aria-label="Flag of Nepal"></svg>
+          <p class="small muted" style="margin:6px 0 0">Drawn by this page from the constitution's steps. No image file used.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 EXPLAIN -->
+    <section class="section" id="s-explain">
+      <div class="sec-head"><div class="sec-num">2</div><div><div class="lbl">Explain the Math</div><h2>Building the flag, step by step</h2></div></div>
+      <p>We call the base length <span class="m">AB</span> = 1 unit. Every other length in the flag is a multiple of it, so the flag can be made at any size and keep exactly the same shape. Use the buttons to follow the construction.</p>
+
+      <div class="widget" id="nepalWidget">
+        <div class="widget-head"><h3>🇳🇵 Interactive construction</h3>
+          <label class="toggle"><input type="checkbox" id="nepCons" checked> Show construction lines</label></div>
+        <div class="stepper-grid">
+          <svg id="nepalSvg" viewBox="0 0 400 450" role="img" aria-label="Step by step construction of Nepal's flag"></svg>
+          <div>
+            <div class="stepper-bar">
+              <button class="btn ghost" id="nepPrev">← Previous step</button>
+              <span class="count" id="nepCount">Step 1 / 18</span>
+              <button class="btn" id="nepNext">Next step →</button>
+            </div>
+            <div class="progress"><i id="nepProg"></i></div>
+            <div class="caption" id="nepCap"></div>
+            <p class="small muted" style="margin-top:10px">Steps (a)–(w) follow the constitution's wording. Some of its steps are combined here. <span class="verify">verify</span> items should be checked against the official text.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>The outer shape in seven moves</h3>
+      <div class="grid2">
+        <ol class="steps-list">
+          <li>Draw the baseline <span class="m">AB</span>.</li>
+          <li>From <span class="m">A</span>, draw <span class="m">AC</span> <strong>perpendicular</strong> to <span class="m">AB</span>, with <span class="m">AC = AB + ⅓AB</span> = 4/3.</li>
+          <li>On <span class="m">AC</span> mark <span class="m">D</span> with <span class="m">AD = AB</span>. Join <span class="m">BD</span>.</li>
+          <li>On <span class="m">BD</span> mark <span class="m">E</span> with <span class="m">BE = AB</span>.</li>
+          <li>Through <span class="m">E</span> draw <span class="m">FG</span> <strong>parallel</strong> to <span class="m">AB</span>, starting at <span class="m">F</span> on <span class="m">AC</span>, with <span class="m">FG = AB</span>.</li>
+          <li>Join <span class="m">CG</span>. The outline is <span class="m">A→B→E→G→C</span>.</li>
+        </ol>
+        <div class="panel">
+          <h4>The concepts in play</h4>
+          <p class="small"><strong>Perpendiculars:</strong> <span class="m">AC ⟂ AB</span> creates a right angle at <span class="m">A</span>, so we can use coordinates and Pythagoras.</p>
+          <p class="small"><strong>Isosceles right triangle:</strong> <span class="m">AD = AB</span> and ∠A = 90°, so △ABD has angles 90°, 45°, 45°. <span class="m">BD</span> has slope −1 and length √2.</p>
+          <p class="small"><strong>Ratios on a line:</strong> <span class="m">BE = 1</span> out of <span class="m">BD = √2</span>, so <span class="m">E</span> sits 1/√2 ≈ 70.7% of the way from B to D. That's where √2 enters the flag.</p>
+          <p class="small"><strong>Parallels &amp; similar triangles:</strong> <span class="m">FE ∥ AB</span>, so △DFE ∼ △DAB (same angles 90°-45°-45°). That gives <span class="m">FE = FD = 1 − 1/√2</span>.</p>
+        </div>
+      </div>
+
+      <h3>Numbers behind the picture</h3>
+      <p>Put <span class="m">A</span> at the origin (0, 0) and <span class="m">B</span> at (1, 0). Each point's exact position follows from the steps above. Here are the computed values:</p>
+      <div class="tbl-wrap"><table id="coordTable"></table></div>
+
+      <h3>Where the moon and the sun come from</h3>
+      <div class="grid2">
+        <div>
+          <p>The emblems aren't placed "by eye". They come from the <strong>same construction lines</strong>:</p>
+          <ul>
+            <li><span class="m">H</span> is ¼ of the way along <span class="m">AB</span>. The vertical line <span class="m">HI</span> (parallel to <span class="m">AC</span>) is the <strong>centre line</strong> for both the moon and the sun.</li>
+            <li><strong>Moon:</strong> <span class="m">J</span> bisects <span class="m">CF</span>. The horizontal <span class="m">JK</span> meets <span class="m">HI</span> at <span class="m">L</span>, and the line <span class="m">JG</span> meets <span class="m">HI</span> at <span class="m">M</span>. The shortest distance from <span class="m">M</span> to <span class="m">BD</span> gives <span class="m">N</span>. Circles centred at <span class="m">L</span>, <span class="m">M</span>, <span class="m">N</span>, and <span class="m">T</span> carve out the crescent and its 8 rays.</li>
+            <li><strong>Sun:</strong> <span class="m">U</span> bisects <span class="m">AF</span>. The horizontal through <span class="m">U</span> meets <span class="m">HI</span> at <span class="m">W</span>, the sun's centre. Its two circles reuse the moon's lengths: radius <span class="m">MN</span> (inner) and <span class="m">LN</span> (outer), with <strong>12 rays</strong> between them.</li>
+            <li><strong>Border:</strong> the blue border's width equals <span class="m">TN</span>, another length taken from the moon's construction.</li>
+          </ul>
+          <div class="insight">Nothing in the flag is measured on its own. The moon's radius sets the sun's size, and the moon's construction sets the border's width. Everything traces back to one length, <span class="m">AB</span>.</div>
+        </div>
+        <div class="panel">
+          <h4>Why the ratio is irrational</h4>
+          <p class="small">Without the border, the shape is 1 wide and 4/3 tall. That's a rational ratio. But:</p>
+          <ol class="small" style="padding-left:18px">
+            <li><span class="m">E</span> = (1 − 1/√2, 1/√2): <strong>√2</strong> comes in through the 45° line.</li>
+            <li><span class="m">P, Q, R, S</span> come from intersecting circles (Pythagoras), which adds <strong>more square roots</strong> nested on top of √2.</li>
+            <li>The border width <span class="m">TN</span> inherits all of these. At the five corners the border meets at a sharp "mitre", so it sticks out further there: by <span class="m">t</span>/sin(θ/2), which brings in the slope of <span class="m">CG</span> as another root.</li>
+          </ol>
+          <div class="formula" style="font-size:1.1rem">
+            <span class="frac"><span>height</span><span>width</span></span> = <span class="frac"><span id="ratH">…</span><span id="ratW">…</span></span> ≈ <strong id="ratOut">1.21901</strong>
+            <span class="cap">computed live by this page from the construction</span>
+          </div>
+          <p class="small">A rational number is one fraction <span class="m">p/q</span> of whole numbers. To get one here, all the square roots would have to cancel out exactly, and they don't. The exact value is a long expression with nested radicals. Its decimal expansion never ends and never repeats. <span class="verify" title="The irrationality is widely reported (e.g. the commonly cited 1 : 1.21901033… ratio); double-check a source for the exact closed form">verify source</span></p>
+        </div>
+      </div>
+
+      <div class="callout"><b>Fact-check list</b> <span class="verify">verify</span> Against the Constitution of Nepal, Schedule 1: (1) exact wording of steps (a)–(w), especially (k) and (o) about <span class="m">N</span>, <span class="m">R</span>, <span class="m">S</span>; (2) that the moon has <strong>8</strong> rays and the sun <strong>12</strong>; (3) that the border width is <span class="m">TN</span>; (4) the article/schedule numbers; (5) the commonly cited ratio 1 : 1.21901033 (this page computes it independently).</div>
+    </section>
+
+    <!-- 3 CREATE -->
+    <section class="section" id="s-create">
+      <div class="sec-head"><div class="sec-num">3</div><div><div class="lbl">Create</div><h2>My flag: the SFBU "Golden Bridge" flag</h2></div></div>
+      <p>Nepal's flag is defined by rules, not by a picture, so I wrote my own <strong>rule set</strong> in the same style for a flag for SFBU, the university where I study, far from Bharatpur. Like the constitution, every length comes from one starting length, so anyone can rebuild it exactly at any size.</p>
+
+      <div class="grid2">
+        <div class="panel">
+          <h4>Schedule: Construction of the SFBU Flag</h4>
+          <ol class="steps-list numeric small">
+            <li>Draw a vertical line <span class="m">AC</span> of the required height.</li>
+            <li>Complete the <strong>square</strong> <span class="m">APQC</span>, with <span class="m">AP</span> drawn to the right of <span class="m">A</span>, perpendicular to <span class="m">AC</span>.</li>
+            <li>Bisect <span class="m">AP</span> at <span class="m">M</span>. With centre <span class="m">M</span> and radius <span class="m">MQ</span>, draw an arc cutting <span class="m">AP</span> extended at <span class="m">B</span>.</li>
+            <li>From <span class="m">B</span> draw <span class="m">BG</span> perpendicular to <span class="m">AB</span>, equal to <span class="m">AC</span>. Join <span class="m">CG</span>. The rectangle <span class="m">ABGC</span> is the flag, coloured deep navy.</li>
+            <li>With centres <span class="m">A</span> and <span class="m">P</span> and radius <span class="m">AP</span>, draw arcs meeting at <span class="m">X</span>. Triangle <span class="m">APX</span> is coloured gold.</li>
+            <li>The segment <span class="m">PQ</span> cuts the flag into a square and a smaller rectangle <span class="m">PBGQ</span>. Keep cutting the smaller rectangle into a square plus a rectangle, five more times.</li>
+            <li>In each square, draw a quarter circle centred at the corner, joining corner to corner, so that the arcs form one continuous white curve.</li>
+            <li>Join <span class="m">CB</span> and <span class="m">GP</span>; let them meet at <span class="m">Z</span>. With centre <span class="m">Z</span>, draw a crimson sun of 12 rays: inner radius <span class="m">AC</span>/22, outer radius <span class="m">AC</span>/11.</li>
+          </ol>
+        </div>
+        <div class="widget" style="margin:0">
+          <div class="widget-head"><h3 style="font-size:1.05rem">Build my flag</h3>
+            <label class="toggle"><input type="checkbox" id="sfCons" checked> Construction lines</label></div>
+          <svg id="sfbuSvg" viewBox="0 0 470 320" role="img" aria-label="Step by step construction of the SFBU flag"></svg>
+          <div class="stepper-bar">
+            <button class="btn ghost" id="sfPrev">←</button>
+            <span class="count" id="sfCount">Step 1 / 8</span>
+            <button class="btn" id="sfNext">Next step →</button>
+          </div>
+          <div class="progress"><i id="sfProg"></i></div>
+          <div class="caption" id="sfCap" style="min-height:96px"></div>
+        </div>
+      </div>
+
+      <h3>Design choices and the math behind them</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Element</th><th>Math</th><th>Why I chose it</th></tr></thead>
+        <tbody>
+          <tr><td>Golden rectangle</td><td style="white-space:normal">Width : height = φ = (1+√5)/2 ≈ 1.618. Like Nepal's flag, the ratio is <strong>irrational</strong> and comes from a square root (MQ = √5 / 2 by Pythagoras).</td><td style="white-space:normal">A deliberate echo of Nepal's flag: exact steps, irrational result.</td></tr>
+          <tr><td>Gold triangle</td><td style="white-space:normal">Equilateral: 60° + 60° + 60° = 180°. A flat-space fact (see Rojan's page).</td><td style="white-space:normal">The Himalaya I grew up with; three equal sides for balance.</td></tr>
+          <tr><td>Self-similarity</td><td style="white-space:normal">Cutting a square off a golden rectangle leaves a smaller golden rectangle, scaled by 1/φ and turned 90°.</td><td style="white-space:normal">The flag has no mirror symmetry. Its symmetry is <em>scaling</em>: the same shape repeats at smaller and smaller sizes, the way learning builds on itself.</td></tr>
+          <tr><td>Spiral</td><td style="white-space:normal">Quarter circles with radii 1, 1/φ, 1/φ², …: a geometric sequence.</td><td style="white-space:normal">Waves in San Francisco Bay, and the path from Bharatpur to the Bay.</td></tr>
+          <tr><td>Hidden coincidence</td><td style="white-space:normal">The first arc has centre P and radius PA = 1, and PX = 1 too, so the arc passes exactly through the triangle's peak X.</td><td style="white-space:normal">I didn't plan this. I found it while drawing. The mountain touches the wave.</td></tr>
+          <tr><td>Crimson sun at Z</td><td style="white-space:normal">Z is where the spiral ends: Z = (φ²/√5, 1 − φ/√5) ≈ (1.171, 0.276).</td><td style="white-space:normal">Nepal's 12-ray sun in Nepal's crimson, placed where everything in the flag converges.</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="insight">The squares get smaller forever, but they all fit inside a flag of finite size and close in on <strong>one exact point, Z</strong>. <strong>How can infinitely many steps end at a single spot?</strong> And could you calculate Z's position yourself, before reading the answer below?</div>
+      <details><summary>Show how to find Z</summary>
+        <p class="small">Put A = (0,0), C = (0,1), B = (φ,0), G = (φ,1). Line CB: <span class="m">y = 1 − x/φ</span>. Line GP: <span class="m">y = φ(x − 1)</span>. Setting them equal gives <span class="m">x(φ + 1/φ) = 1 + φ</span>. Since φ + 1/φ = √5 and 1 + φ = φ², this simplifies to <span class="m">x = φ²/√5 ≈ 1.1708</span> and <span class="m">y ≈ 0.2764</span>. Every square in the spiral has a corner on one of these two diagonals, which is why the spiral closes in on their crossing point.</p>
+      </details>
+
+      <h3>Reflection</h3>
+      <div class="reflect">
+        <div class="panel"><h4>Choices I made</h4><p class="small">I copied the <em>form</em> of Nepal's constitution: numbered steps, one starting length, nothing measured by eye. I swapped in different shapes (golden rectangle, equilateral triangle, spiral) so that my flag tells my own story.</p></div>
+        <div class="panel"><h4>The math behind them</h4><p class="small">Perpendiculars, bisection, Pythagoras (√5), equilateral triangles, geometric sequences, and intersecting lines. Each step only uses a ruler and compass, just like Nepal's flag.</p></div>
+        <div class="panel"><h4>What I want you to wonder</h4><p class="small">If a flag can be written as a list of instructions, <strong>is a flag a picture or an algorithm?</strong> What other everyday objects are secretly instructions?</p><p class="small"><span class="todo">Sanskrit: add</span> a sentence on what surprised you while building it.</p></div>
+      </div>
+      <div class="backhome"><button class="btn ghost" data-home>← Back to Home</button></div>
+    </section>
+  </div>
+</section>
+
+<!-- =============================================================
+     CONNECTION
+     ============================================================= -->
+<section class="view" id="view-connection">
+  <header class="hero hero-connection">
+    <canvas class="starfield" data-stars="90"></canvas>
+    <div class="wrap">
+      <button class="backbtn" data-home>← Back to Home</button>
+      <div class="kicker" style="background:rgba(255,255,255,.15);color:#fff">Rojan × Sanskrit</div>
+      <h1>How Our Topics Connect</h1>
+      <p class="lead">One of us builds with triangles. The other tests whether the rules for building them are true.</p>
+    </div>
+  </header>
+  <div class="wrap">
+    <section class="section">
+      <div class="grid2">
+        <div>
+          <h2>Same triangles, opposite questions</h2>
+          <p>Nepal's flag construction quietly relies on <strong>Euclid's flat-space rules</strong>:</p>
+          <ul>
+            <li><strong>Parallel lines exist and never meet:</strong> FG ∥ AB, JK ∥ AB, HI ∥ AC, UV ∥ AB.</li>
+            <li><strong>Triangle angles sum to 180°:</strong> △ABD's 90° + 45° + 45°.</li>
+            <li><strong>Similar triangles:</strong> △DFE ∼ △DAB, and scaling the whole flag to "the required length" keeps its shape.</li>
+          </ul>
+          <p>Rojan's project asks whether those same rules hold <strong>for the whole universe</strong>. The answer (Planck: curvature ≈ 0) says yes, as far as we can measure. So the flag's construction would work even at cosmic scale.</p>
+          <div class="insight">On a sphere, <strong>similar triangles don't exist</strong>: two triangles with the same angles must also be the same size, because the angle excess depends on area. So Nepal's flag could not be drawn "at any size" on a curved surface. Each size would come out a slightly different shape. The flag being the same at every size is a small piece of evidence that the space we draw in is flat.</div>
+        </div>
+        <div class="widget" style="margin-top:0">
+          <div class="widget-head"><h3 style="font-size:1.05rem">Nepal's flag in curved space</h3></div>
+          <svg id="warpSvg" viewBox="0 0 400 400" role="img" aria-label="Nepal flag on flat versus curved space"></svg>
+          <div class="range-row" style="margin-top:10px">
+            <label for="warpK"><span>Curvature</span><span id="warpName">Flat</span></label>
+            <input type="range" id="warpK" min="-100" max="100" value="0">
+            <div class="range-ends"><span>◀ Saddle</span><span>Flat</span><span>Ball ▶</span></div>
+          </div>
+          <div class="readout" style="grid-template-columns:1fr 1fr">
+            <div><small>△ABD angle sum</small><b id="warpSum">180.0°</b></div>
+            <div><small>Construction</small><b id="warpOk" style="font-size:1rem">Works exactly</b></div>
+          </div>
+          <p class="small muted" style="margin:10px 0 0">Illustration: the flat flag is mapped onto a curved surface, keeping distances from the centre. Straight edges bow outward on a ball and pinch inward on a saddle.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>The chain of ideas</h2>
+      <div class="grid3">
+        <div class="panel"><div class="tag">Sanskrit</div><h4 style="margin-top:8px">Rules build a shape</h4><p class="small">Perpendiculars + parallels + equal lengths → an exact flag with an irrational ratio.</p></div>
+        <div class="panel"><div class="tag">Both</div><h4 style="margin-top:8px">The rules assume flat space</h4><p class="small">Parallel lines and 180° triangles are only true on a flat surface. They are choices about space, not facts about triangles.</p></div>
+        <div class="panel"><div class="tag">Rojan</div><h4 style="margin-top:8px">Test the rules on the universe</h4><p class="small">The CMB triangle gives ≈ 180°. The universe is flat, so Euclid's (and Nepal's) rules hold at the largest scale we can measure.</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Our mathematical mindset</h2>
+      <div class="mindset">
+        <div class="panel"><div class="ico">🔍</div><h4>Curiosity</h4><p class="small">Both projects started with something we'd seen a thousand times and never questioned: a flag on a school wall, and "angles add to 180°" in a textbook.</p></div>
+        <div class="panel"><div class="ico">✏️</div><h4>Mistakes</h4><p class="small">Our first measurements on the ball and our first flag drawings were off. Working out <em>why</em> (protractor error, a line that wasn't really "straight" on a curve, a misread step) taught us more than getting it right the first time.</p><p class="small"><span class="todo">Both: add</span> one real mistake each.</p></div>
+        <div class="panel"><div class="ico">🧗</div><h4>Persistence</h4><p class="small">The constitution's steps and Girard's theorem both looked intimidating at first. Taking them one line at a time made them manageable, the same way the flag itself is built.</p></div>
+      </div>
+      <div class="callout" style="margin-top:24px"><b>Takeaway.</b> A triangle isn't just a shape. It's a test of the space it lives in. On a flag, it gives us a nation's symbol. Across the sky, it tells us the universe is flat.</div>
+      <div class="backhome"><button class="btn ghost" data-home>← Back to Home</button></div>
+    </section>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="bar" style="margin:-34px 0 30px"></div>
+  <div class="wrap">
+    <div><b>How to Use Math in Life – SFBU</b><br><span>Midterm Project · Geometry in the World</span></div>
+    <div>Rojan Dhungana &amp; Sanskrit Adhikari</div>
+  </div>
+</footer>
+
+<script>
+/* =========================================================
+   EDIT YOUR MEASUREMENTS HERE (Rojan's Create section)
+   Put numbers in place of null, e.g. flat: [61, 58, 60]
+   ========================================================= */
+const ROJAN_MEASUREMENTS = {
+  flat:    [null, null, null],
+  ball:    [null, null, null],
+  pringle: [null, null, null]
+};
+
+(function(){
+"use strict";
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const deg = r => r*180/Math.PI, rad = d => d*Math.PI/180;
+const f = (n,d=1) => Number(n).toFixed(d);
+
+/* ================= ROUTER ================= */
+const ROUTES = ['home','rojan','sanskrit','connection'];
+function route(){
+  let r = location.hash.replace('#','') || 'home';
+  if(!ROUTES.includes(r)) r = 'home';
+  $$('.view').forEach(v => v.classList.toggle('active', v.id === 'view-'+r));
+  $$('.navlinks a').forEach(a => a.classList.toggle('active', a.dataset.r === r));
+  document.body.dataset.route = r;
+  window.scrollTo({top:0, behavior:'instant'});
+  requestAnimationFrame(drawAllStars);
+  if(r==='rojan') drawCurv();
+}
+window.addEventListener('hashchange', route);
+document.addEventListener('click', e => {
+  const h = e.target.closest('[data-home]');
+  if(h){ location.hash = '#home'; return; }
+  const s = e.target.closest('[data-scroll]');
+  if(s){ const el = document.getElementById(s.dataset.scroll); if(el){ const y = el.getBoundingClientRect().top + scrollY - 70; scrollTo({top:y, behavior:'smooth'}); } }
+});
+
+/* ================= STARS ================= */
+function drawStars(c){
+  const p = c.parentElement, w = p.clientWidth, h = p.clientHeight;
+  if(!w || !h) return;
+  const dpr = Math.min(devicePixelRatio||1, 2);
+  c.width = w*dpr; c.height = h*dpr;
+  const x = c.getContext('2d'); x.scale(dpr,dpr);
+  let seed = (+c.dataset.stars||100)*7919;
+  const rnd = () => (seed = (seed*16807) % 2147483647) / 2147483647;
+  const n = Math.round((+c.dataset.stars||100) * (w*h)/(1000*500));
+  for(let i=0;i<n;i++){
+    const r = rnd()<.92 ? rnd()*1.1+.2 : rnd()*1.8+1;
+    x.globalAlpha = .35 + rnd()*.65;
+    x.fillStyle = rnd()<.15 ? '#ffd98a' : (rnd()<.3 ? '#a9c2ff' : '#ffffff');
+    x.beginPath(); x.arc(rnd()*w, rnd()*h, r, 0, 7); x.fill();
+  }
+}
+function drawAllStars(){ $$('canvas[data-stars]').forEach(drawStars); }
+let rT; addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(drawAllStars, 150); });
+
+/* ================= SVG HELPERS ================= */
+const pathFrom = (pts, close=true) => 'M' + pts.map(p => p[0].toFixed(2)+' '+p[1].toFixed(2)).join(' L') + (close?' Z':'');
+const arcPts = (c, r, a0, a1, n=48) => Array.from({length:n+1}, (_,k) => { const a = a0+(a1-a0)*k/n; return [c[0]+r*Math.cos(a), c[1]+r*Math.sin(a)]; });
+
+/* =========================================================
+   NEPAL FLAG GEOMETRY  (unit AB = 1, A at origin, y up)
+   ========================================================= */
+const N = (function(){
+  const r2 = Math.SQRT2, P = {};
+  P.A=[0,0]; P.B=[1,0]; P.C=[0,4/3]; P.D=[0,1];
+  P.E=[1-1/r2, 1/r2]; P.F=[0,1/r2]; P.G=[1,1/r2];
+  const cg = x => P.C[1] + (P.G[1]-P.C[1])*x;
+  P.H=[.25,0]; P.I=[.25, cg(.25)];
+  P.J=[0,(P.C[1]+P.F[1])/2];
+  P.K=[(P.C[1]-P.J[1])/(P.C[1]-P.G[1]), P.J[1]];
+  P.L=[.25, P.J[1]];
+  P.M=[.25, P.J[1] + (P.G[1]-P.J[1])*.25];
+  const MN = Math.abs(P.M[0]+P.M[1]-1)/r2;                 // distance M to line BD (x+y=1)
+  const foot = [P.M[0]-(P.M[0]+P.M[1]-1)/2, P.M[1]-(P.M[0]+P.M[1]-1)/2];
+  P.N=[.25, P.M[1]-MN];
+  P.O=[0, P.M[1]];
+  const LN = P.L[1]-P.N[1], dy = P.L[1]-P.M[1], hx = Math.sqrt(LN*LN-dy*dy);
+  P.P=[.25-hx, P.M[1]]; P.Q=[.25+hx, P.M[1]];
+  const MQ = hx;
+  const a = MN*MN/(2*LN), hh = Math.sqrt(MN*MN-a*a);       // circle(N,MN) ∩ circle(L,LN)
+  P.T=[.25, P.N[1]+a]; P.R=[.25-hh, P.T[1]]; P.S=[.25+hh, P.T[1]];
+  const TS = hh, TM = P.M[1]-P.T[1], TN = a;
+  P.U=[0, P.F[1]/2]; P.V=[1-P.U[1], P.U[1]]; P.W=[.25, P.U[1]];
+
+  const inner = [P.A,P.B,P.E,P.G,P.C];
+  // mitred outward offset of a CCW polygon
+  function offset(poly, t){
+    const n = poly.length, lines = [];
+    for(let i=0;i<n;i++){
+      const p = poly[i], q = poly[(i+1)%n], dx=q[0]-p[0], dy=q[1]-p[1], L=Math.hypot(dx,dy);
+      const nx = dy/L, ny = -dx/L;
+      lines.push({p:[p[0]+nx*t, p[1]+ny*t], d:[dx,dy]});
+    }
+    return poly.map((_,i) => {
+      const l1 = lines[(i-1+n)%n], l2 = lines[i];
+      const det = l1.d[0]*(-l2.d[1]) - l1.d[1]*(-l2.d[0]);
+      const rx = l2.p[0]-l1.p[0], ry = l2.p[1]-l1.p[1];
+      const s = (rx*(-l2.d[1]) - ry*(-l2.d[0]))/det;
+      return [l1.p[0]+l1.d[0]*s, l1.p[1]+l1.d[1]*s];
+    });
+  }
+  const outer = offset(inner, TN);
+  const xs = outer.map(p=>p[0]), ys = outer.map(p=>p[1]);
+  const width = Math.max(...xs)-Math.min(...xs), height = Math.max(...ys)-Math.min(...ys);
+
+  // emblem shapes
+  const aQ = Math.atan2(-dy, hx), aP = Math.atan2(-dy, -hx);
+  const crescent = arcPts(P.M, MQ, Math.PI, 2*Math.PI, 60).concat(arcPts(P.L, LN, aQ, aP, 60));
+  const moonFace = arcPts(P.T, TM, 0, Math.PI, 40);
+  const moonRays = [];
+  for(let k=0;k<8;k++){ const a0=k*Math.PI/8, a1=(k+1)*Math.PI/8, am=(a0+a1)/2;
+    moonRays.push([[P.T[0]+TM*Math.cos(a0),P.T[1]+TM*Math.sin(a0)],[P.T[0]+TS*Math.cos(am),P.T[1]+TS*Math.sin(am)],[P.T[0]+TM*Math.cos(a1),P.T[1]+TM*Math.sin(a1)]]); }
+  const sunDisk = arcPts(P.W, MN, 0, 2*Math.PI, 72).slice(0,-1);
+  const sunRays = [];
+  for(let k=0;k<12;k++){ const am = Math.PI/2 + k*Math.PI/6, a0 = am-Math.PI/12, a1 = am+Math.PI/12;
+    sunRays.push([[P.W[0]+MN*Math.cos(a0),P.W[1]+MN*Math.sin(a0)],[P.W[0]+LN*Math.cos(am),P.W[1]+LN*Math.sin(am)],[P.W[0]+MN*Math.cos(a1),P.W[1]+MN*Math.sin(a1)]]); }
+
+  return {P, MN, LN, MQ, TS, TM, TN, foot, inner, outer, width, height, ratio:height/width,
+          crescent, moonFace, moonRays, sunDisk, sunRays};
+})();
+
+// unit → svg coordinates (400×450 box)
+const NS = {S:250, ox:70, oy:30, top:1.47};
+const nx = x => NS.ox + x*NS.S, ny = y => NS.oy + (NS.top - y)*NS.S;
+const np = p => [nx(p[0]), ny(p[1])];
+const nPath = (pts, close=true) => pathFrom(pts.map(np), close);
+
+function flagMarkup(map, opts={}){
+  const P = pts => pathFrom(pts.map(map));
+  let s = '';
+  if(opts.border!==false) s += `<path d="${P(N.outer)}" fill="#003893"/>`;
+  s += `<path d="${P(N.inner)}" fill="#DC143C"/>`;
+  if(opts.moon!==false){
+    s += `<path d="${P(N.crescent)}" fill="#fff"/><path d="${P(N.moonFace)}" fill="#fff"/>`;
+    N.moonRays.forEach(t => s += `<path d="${P(t)}" fill="#fff"/>`);
+  }
+  if(opts.sun!==false){
+    s += `<path d="${P(N.sunDisk)}" fill="#fff"/>`;
+    N.sunRays.forEach(t => s += `<path d="${P(t)}" fill="#fff"/>`);
+  }
+  return s;
+}
+
+/* ---------- home + notice flags ---------- */
+$('#homeFlag').innerHTML = flagMarkup(p => [p[0]*130, (1.42-p[1])*130]);
+$('#noticeFlag').innerHTML = flagMarkup(np);
+
+/* ---------- coordinates table ---------- */
+(function(){
+  const rows = [['A','origin'],['B','AB = 1'],['C','AC = 4/3'],['D','AD = AB'],['E','BE = AB on BD'],['F','on AC, level with E'],['G','FG = AB'],
+    ['H','AH = ¼ AB'],['L','JK ∩ HI'],['M','JG ∩ HI'],['N','MN = dist(M, BD)'],['T','RS ∩ HI'],['W','sun centre']];
+  let h = '<thead><tr><th>Point</th><th>How it is made</th><th>x</th><th>y</th></tr></thead><tbody>';
+  rows.forEach(([k,d]) => h += `<tr><td><b>${k}</b></td><td>${d}</td><td class="num">${f(N.P[k][0],4)}</td><td class="num">${f(N.P[k][1],4)}</td></tr>`);
+  h += `<tr><td><b>TN</b></td><td>border width</td><td class="num" colspan="2">${f(N.TN,5)}</td></tr></tbody>`;
+  $('#coordTable').innerHTML = h;
+  $('#ratH').textContent = f(N.height,5);
+  $('#ratW').textContent = f(N.width,5);
+  $('#ratOut').textContent = f(N.ratio,8) + '…';
+})();
+
+/* =========================================================
+   GENERIC STEPPER
+   ========================================================= */
+function Stepper(cfg){
+  let i = 0;
+  const show = () => {
+    cfg.render(i);
+    const s = cfg.steps[i];
+    cfg.cap.innerHTML = `<h4>${s.t}</h4><p>${s.c}</p>`;
+    cfg.count.textContent = `Step ${i+1} / ${cfg.steps.length}`;
+    cfg.prog.style.width = ((i+1)/cfg.steps.length*100)+'%';
+    cfg.prev.disabled = i===0;
+    cfg.next.textContent = i===cfg.steps.length-1 ? 'Start over ↺' : 'Next step →';
+  };
+  cfg.prev.onclick = () => { if(i>0){ i--; show(); } };
+  cfg.next.onclick = () => { i = i<cfg.steps.length-1 ? i+1 : 0; show(); };
+  if(cfg.toggle) cfg.toggle.onchange = show;
+  show();
+}
+
+/* =========================================================
+   NEPAL CONSTRUCTION STEPPER
+   ========================================================= */
+(function(){
+  const P = N.P;
+  const ln = (a,b,cls='') => { const A = Array.isArray(a)?a:P[a], B = Array.isArray(b)?b:P[b];
+    return `<line class="${cls}" x1="${nx(A[0])}" y1="${ny(A[1])}" x2="${nx(B[0])}" y2="${ny(B[1])}"/>`; };
+  const circ = (c,r,cls='aux') => `<circle class="${cls}" cx="${nx(c[0])}" cy="${ny(c[1])}" r="${r*NS.S}" fill="none"/>`;
+  const arcU = (c,r,a0,a1,cls='') => `<path class="${cls}" fill="none" d="${nPath(arcPts(c,r,a0,a1,40),false)}"/>`;
+  const v = '<span class="verify">verify</span>';
+  const LBL = {A:[-16,16],B:[6,16],C:[-18,4],D:[-18,4],E:[-16,-6],F:[-18,6],G:[8,4],H:[3,16],I:[6,-6],J:[-18,4],K:[6,-6],
+    L:[6,-5],M:[6,-5],N:[6,11],O:[-18,4],P:[-14,-5],Q:[5,-5],R:[-14,12],S:[6,12],T:[-14,3],U:[-18,4],V:[6,-4],W:[6,-6]};
+  const steps = [
+    {t:'(a) Baseline AB', pts:['A','B'], c:'Draw a straight line AB from left to right on the crimson cloth. We call its length 1 unit. Every other length in the flag is built from it.',
+      d:()=>ln('A','B')},
+    {t:'(b) Perpendicular AC = AB + ⅓AB', pts:['C'], c:'From A draw AC perpendicular to AB, with AC = 1 + ⅓ = <b>4/3</b>. The little square marks the 90° angle.',
+      d:()=>ln('A','C')+`<path class="aux2" fill="none" d="M${nx(0)} ${ny(.06)} H${nx(.06)} V${ny(0)}"/>`},
+    {t:'(b) Mark D with AD = AB, join BD', pts:['D'], c:'Swing a compass from A with radius AB to mark D on AC. △ABD is an <b>isosceles right triangle</b> (90°, 45°, 45°), so BD = √2.',
+      d:()=>arcU(P.A,1,0,Math.PI/2,'aux')+ln('B','D')},
+    {t:'(c) Mark E on BD with BE = AB', pts:['E'], c:'Swing a compass from B with radius AB = 1. It cuts BD at E = (1 − 1/√2, 1/√2) ≈ (0.293, 0.707). <b>This is where √2 enters the flag.</b>',
+      d:()=>arcU(P.B,1,Math.PI*.62,Math.PI*.88,'aux')},
+    {t:'(d) FG through E, parallel to AB', pts:['F','G'], c:'Through E, draw FG <b>parallel</b> to AB, starting at F on AC, with FG = AB = 1. △DFE ∼ △DAB (both 45-45-90), so FE = FD ≈ 0.293.',
+      d:()=>ln('F','G')},
+    {t:'(e) Join CG: the outline is complete', pts:[], c:'Joining C to G closes the outline A → B → E → G → C: two stacked triangular pennants. Without the border it is exactly 1 wide and 4/3 tall.',
+      d:()=>ln('C','G'), fill:[[1, () => `<path d="${nPath(N.inner)}" fill="#DC143C" opacity=".92"/>`]]},
+    {t:'(f) H with AH = ¼AB, line HI ∥ AC', pts:['H','I'], c:'Mark H a quarter of the way along AB and draw HI parallel to AC up to CG. <b>HI is the centre line of both the moon and the sun.</b>',
+      d:()=>ln('H','I')},
+    {t:'(g)–(h) Bisect CF at J, JK ∥ AB, L = JK ∩ HI', pts:['J','K','L'], c:'J is the midpoint of CF. The line JK, parallel to AB, crosses HI at L. L will be the centre of the moon\'s inner arc.',
+      d:()=>ln('J','K')},
+    {t:'(i)–(j) Join JG, M = JG ∩ HI', pts:['M'], c:'The slanted line JG crosses the centre line at M. M\'s height comes from a <b>ratio along the line</b>: HI is ¼ of the way across, so M is ¼ of the way from J to G.',
+      d:()=>ln('J','G')},
+    {t:'(k) N: shortest distance from M to BD', pts:['N'], c:'The shortest distance from a point to a line is the <b>perpendicular</b> (dashed). Mark that same distance down HI from M to get N. MN ≈ '+f(N.MN,4)+'. '+v,
+      d:()=>ln('M',N.foot,'aux2')+arcU(P.M,N.MN,-Math.PI/2,-Math.PI/4,'aux')},
+    {t:'(l)–(m) Line OM, semicircle centre L radius LN', pts:['O','P','Q'], c:'Draw OM parallel to AB. With centre L and radius LN, draw the lower semicircle. It meets OM at P and Q. This arc PNQ is the <b>inside edge</b> of the crescent.',
+      d:()=>ln('O',[.5,P.M[1]])+arcU(P.L,N.LN,Math.PI,2*Math.PI,'aux')},
+    {t:'(n) Semicircle centre M radius MQ: the crescent', pts:[], c:'With centre M and radius MQ, draw the lower semicircle through P and Q. The region between the two arcs is the <b>crescent moon</b>.',
+      d:()=>arcU(P.M,N.MQ,Math.PI,2*Math.PI,'aux'), fill:[[3, () => `<path d="${nPath(N.crescent)}" fill="#fff"/>`]]},
+    {t:'(o) Arc centre N radius NM → R, S; T = RS ∩ HI', pts:['R','S','T'], c:'With centre N and radius NM, draw an arc cutting the arc PNQ at R and S. RS meets HI at T, the centre of the moon\'s face. '+v,
+      d:()=>circ(P.N,N.MN)+ln('R','S')},
+    {t:'(p)–(r) The moon: 8 rays', pts:[], c:'With centre T draw upper semicircles of radius TS and TM. <b>Eight equal triangles</b> fit between them, and the inner half-disc is the moon\'s face.',
+      d:()=>circ(P.T,N.TS)+circ(P.T,N.TM), fill:[[3, () => { let s=`<path d="${nPath(N.moonFace)}" fill="#fff"/>`; N.moonRays.forEach(t=>s+=`<path d="${nPath(t)}" fill="#fff"/>`); return s; }]]},
+    {t:'(s) Bisect AF at U, UV ∥ AB', pts:['U','V','W'], c:'U is the midpoint of AF. The line UV parallel to AB meets BE at V and crosses the centre line HI at W, the <b>centre of the sun</b>.',
+      d:()=>ln('U','V')},
+    {t:'(t)–(u) Two circles centred at W', pts:[], c:'Draw circles centred at W with radius MN (≈ '+f(N.MN,3)+') and radius LN (≈ '+f(N.LN,3)+'). The sun <b>reuses lengths from the moon\'s construction</b>.',
+      d:()=>circ(P.W,N.MN)+circ(P.W,N.LN)},
+    {t:'(v) The sun: 12 rays', pts:[], c:'Twelve equal triangles fill the ring between the circles, with two tips touching HI (straight up and straight down). Each ray is 360° ÷ 12 = 30° apart.',
+      d:()=>'', fill:[[3, () => { let s=`<path d="${nPath(N.sunDisk)}" fill="#fff"/>`; N.sunRays.forEach(t=>s+=`<path d="${nPath(t)}" fill="#fff"/>`); return s; }]]},
+    {t:'(w) Blue border of width TN', pts:[], c:'The deep-blue border has width TN ≈ '+f(N.TN,4)+' on every side, meeting in sharp mitres so that "the external angles equal the internal angles". Final height ÷ width = <b>'+f(N.ratio,5)+'…</b> '+v,
+      d:()=>'', fill:[[0, () => `<path d="${nPath(N.outer)}" fill="#003893"/>`]]}
+  ];
+  const svg = $('#nepalSvg'), tog = $('#nepCons');
+  const style = `<style>#nepalSvg line,#nepalSvg path.cl,#nepalSvg .aux,#nepalSvg .aux2{stroke:#2a2f3d;stroke-width:1.3}
+    #nepalSvg .aux{stroke-dasharray:4 4;stroke:#6b7285;stroke-width:1}#nepalSvg .aux2{stroke-dasharray:3 3;stroke:#003893}
+    #nepalSvg g.old{opacity:.4}#nepalSvg g.cur line,#nepalSvg g.cur path{stroke:#003893;stroke-width:2.4}#nepalSvg g.cur .aux{stroke-width:1.5}</style>`;
+  function render(i){
+    const cons = tog.checked; let fills = [], lines = '', labels = '';
+    steps.slice(0,i+1).forEach((s,j) => {
+      (s.fill||[]).forEach(fl => fills.push(fl));
+      if(cons) lines += `<g class="${j===i?'cur':'old'}">${s.d()}</g>`;
+      if(cons) s.pts.forEach(k => { const p = P[k], o = LBL[k]||[6,-6];
+        labels += `<circle cx="${nx(p[0])}" cy="${ny(p[1])}" r="${j===i?3.6:2.6}" fill="${j===i?'#003893':'#1a1d27'}"/>`+
+          `<text class="lbl-pt ${j===i?'cur':''}" x="${nx(p[0])+o[0]}" y="${ny(p[1])+o[1]}" style="paint-order:stroke;stroke:#fff;stroke-width:3px">${k}</text>`; });
+    });
+    fills.sort((a,b)=>a[0]-b[0]);
+    svg.innerHTML = style + `<rect x="0" y="0" width="400" height="450" fill="#fffdfb"/>` + fills.map(x=>x[1]()).join('') + lines + labels;
+  }
+  Stepper({steps, render, cap:$('#nepCap'), count:$('#nepCount'), prog:$('#nepProg'), prev:$('#nepPrev'), next:$('#nepNext'), toggle:tog});
+})();
+
+/* =========================================================
+   SFBU GOLDEN BRIDGE FLAG STEPPER
+   ========================================================= */
+(function(){
+  const phi = (1+Math.sqrt(5))/2, q = 1/phi;
+  const S = 240, ox = 40, oy = 40;
+  const X = x => ox + x*S, Y = y => oy + (1-y)*S, pt = p => [X(p[0]), Y(p[1])];
+  const P = {A:[0,0], C:[0,1], P:[1,0], Q:[1,1], M:[.5,0], B:[phi,0], G:[phi,1], X:[.5,Math.sqrt(3)/2]};
+  P.Z = [phi*phi/Math.sqrt(5), 1-phi/Math.sqrt(5)];
+  // spiral arcs + squares
+  const arcs = []; let st = [0,0], a = Math.PI;
+  for(let i=0;i<7;i++){ const r = Math.pow(q,i), c = [st[0]-r*Math.cos(a), st[1]-r*Math.sin(a)], a1 = a-Math.PI/2;
+    arcs.push({c, r, a0:a, a1}); st = [c[0]+r*Math.cos(a1), c[1]+r*Math.sin(a1)]; a = a1; }
+  const sq = k => { const {c,r,a0,a1} = arcs[k], u0=[Math.cos(a0),Math.sin(a0)], u1=[Math.cos(a1),Math.sin(a1)];
+    return pathFrom([c,[c[0]+r*u0[0],c[1]+r*u0[1]],[c[0]+r*(u0[0]+u1[0]),c[1]+r*(u0[1]+u1[1])],[c[0]+r*u1[0],c[1]+r*u1[1]]].map(pt)); };
+  const spiralPath = n => { let pts = []; for(let k=0;k<n;k++) pts = pts.concat(arcPts(arcs[k].c, arcs[k].r, arcs[k].a0, arcs[k].a1, 30)); return pathFrom(pts.map(pt), false); };
+  const sun = () => { const z = P.Z, r0 = 1/22, r1 = 1/11; let pts = [];
+    for(let k=0;k<24;k++){ const ang = Math.PI/2 + k*Math.PI/12, r = k%2===0 ? r1 : r0; pts.push([z[0]+r*Math.cos(ang), z[1]+r*Math.sin(ang)]); }
+    return `<path d="${pathFrom(pts.map(pt))}" fill="#DC143C" stroke="#fff" stroke-width="1"/><circle cx="${X(z[0])}" cy="${Y(z[1])}" r="${S/34}" fill="#DC143C"/>`; };
+  const ln = (a,b,cls='') => { const A = Array.isArray(a)?a:P[a], B = Array.isArray(b)?b:P[b];
+    return `<line class="${cls}" x1="${X(A[0])}" y1="${Y(A[1])}" x2="${X(B[0])}" y2="${Y(B[1])}"/>`; };
+  const arcL = (c,r,a0,a1,cls='aux') => `<path class="${cls}" fill="none" d="${pathFrom(arcPts(c,r,a0,a1,40).map(pt),false)}"/>`;
+  const LBL = {A:[-14,14],C:[-14,0],P:[-4,16],Q:[-6,-8],M:[-4,16],B:[2,16],G:[4,-8],X:[-5,-9],Z:[10,-10]};
+  const steps = [
+    {t:'1. Height AC', pts:['A','C'], c:'Start with one length: the height AC = 1. Everything else is built from it.', d:()=>ln('A','C')},
+    {t:'2. Square APQC', pts:['P','Q'], c:'Draw AP ⟂ AC and complete the square APQC. All its sides are 1 and all its angles 90°.', d:()=>ln('A','P')+ln('P','Q')+ln('Q','C')},
+    {t:'3. Golden point B', pts:['M','B'], c:'M is the midpoint of AP. By Pythagoras, MQ = √(½² + 1²) = √5 / 2. An arc centred at M swings Q down to B, so AB = ½ + √5/2 = <b>φ ≈ 1.618</b>.',
+      d:()=>ln('M','Q','aux')+arcL(P.M,Math.sqrt(5)/2,Math.atan2(1,.5),0)+ln('P','B')},
+    {t:'4. Golden rectangle ABGC', pts:['G'], c:'Raise BG ⟂ AB and join CG. Width : height = φ : 1, an <b>irrational ratio</b>, just like Nepal\'s flag.',
+      d:()=>ln('B','G')+ln('G','C'), fill:[[0,()=>`<path d="${pathFrom([P.A,P.B,P.G,P.C].map(pt))}" fill="#0b2545"/>`]]},
+    {t:'5. Equilateral triangle APX', pts:['X'], c:'Arcs of radius AP from A and from P meet at X. Each angle of the triangle is 60°, and 60° + 60° + 60° = 180°. These are my Himalaya.',
+      d:()=>arcL(P.A,1,Math.PI/6,Math.PI/2.6)+arcL(P.P,1,Math.PI-Math.PI/2.6,Math.PI*5/6), fill:[[1,()=>`<path d="${pathFrom([P.A,P.P,P.X].map(pt))}" fill="#f2b705"/>`]]},
+    {t:'6. Squares inside squares', pts:[], c:'Cut a square off the leftover rectangle again and again. Each new rectangle is golden too, scaled by 1/φ ≈ 0.618 and turned 90°. This is <b>self-similarity</b>.',
+      d:()=>{ let s=''; for(let k=1;k<7;k++) s += `<path class="sq" fill="none" d="${sq(k)}"/>`; return s; }},
+    {t:'7. The golden spiral', pts:[], c:'A quarter circle in each square joins up into one spiral with radii 1, 0.618, 0.382, … The first arc passes <b>exactly</b> through X, because PX = PA = 1.',
+      d:()=>'', fill:[[2,()=>`<path d="${spiralPath(7)}" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/>`]]},
+    {t:'8. The crimson sun at Z', pts:['Z'], c:'The diagonals CB and GP cross at Z, the point the spiral closes in on. There I place a 12-ray sun in Nepal\'s crimson: Bharatpur at the centre of the Bay.',
+      d:()=>ln('C','B','aux2')+ln('G','P','aux2'), fill:[[3, sun]]}
+  ];
+  const svg = $('#sfbuSvg'), tog = $('#sfCons');
+  const style = `<style>#sfbuSvg line{stroke:#7a8199;stroke-width:1.3}#sfbuSvg .aux{stroke:#7a8199;stroke-dasharray:4 4;stroke-width:1}
+   #sfbuSvg .aux2{stroke:#ff8fa6;stroke-dasharray:5 4;stroke-width:1.2}#sfbuSvg .sq{stroke:rgba(255,255,255,.55);stroke-width:1}
+   #sfbuSvg g.cur line{stroke:#DC143C;stroke-width:2.2}#sfbuSvg g.cur .aux{stroke:#DC143C}#sfbuSvg g.cur .sq{stroke:#ffd166;stroke-width:1.6}
+   #sfbuSvg g.old{opacity:.55}</style>`;
+  function render(i){
+    const cons = tog.checked; let fills=[], lines='', labels='';
+    steps.slice(0,i+1).forEach((s,j) => {
+      (s.fill||[]).forEach(fl => fills.push(fl));
+      if(cons) lines += `<g class="${j===i?'cur':'old'}">${s.d()}</g>`;
+      if(cons) s.pts.forEach(k => { const p = P[k], o = LBL[k]||[6,-6];
+        labels += `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="3" fill="${j===i?'#DC143C':'#1a1d27'}" stroke="#fff" stroke-width="1"/>`+
+          `<text class="lbl-pt" x="${X(p[0])+o[0]}" y="${Y(p[1])+o[1]}" style="paint-order:stroke;stroke:#fff;stroke-width:3px">${k}</text>`; });
+    });
+    fills.sort((a,b)=>a[0]-b[0]);
+    svg.innerHTML = style + `<rect width="470" height="320" fill="#fffdfb"/>` + fills.map(x=>x[1]()).join('') + lines + labels;
+  }
+  Stepper({steps, render, cap:$('#sfCap'), count:$('#sfCount'), prog:$('#sfProg'), prev:$('#sfPrev'), next:$('#sfNext'), toggle:tog});
+})();
+
+/* =========================================================
+   ROJAN: CURVATURE INTERACTIVE
+   ========================================================= */
+const kS = $('#kSlider'), sS = $('#sSlider');
+function drawCurv(){
+  const k = +kS.value/100, s = +sS.value/100;
+  const e = 90*k*s*s;                       // excess in degrees (model: K·A)
+  const sum = 180+e, each = sum/3;
+  const cx = 200, cy = 182, R = 30 + 110*s;
+  const V = [0,1,2].map(i => { const a = -Math.PI/2 + i*2*Math.PI/3; return [cx+R*Math.cos(a), cy+R*Math.sin(a)]; });
+  const L = R*Math.sqrt(3), b = (L/2)*Math.tan(rad(e/6));
+  const ctrl = [];
+  for(let i=0;i<3;i++){ const p = V[i], q = V[(i+1)%3], m = [(p[0]+q[0])/2,(p[1]+q[1])/2];
+    const d = [m[0]-cx, m[1]-cy], dl = Math.hypot(...d); ctrl.push([m[0]+d[0]/dl*b, m[1]+d[1]/dl*b]); }
+  const tri = `M${V[0]} Q${ctrl[0]} ${V[1]} Q${ctrl[1]} ${V[2]} Q${ctrl[2]} ${V[0]}Z`;
+  const ak = Math.abs(k);
+  let bg = `<defs><radialGradient id="sph" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#3f5fe0"/><stop offset=".6" stop-color="#16246b"/><stop offset="1" stop-color="#070b24"/></radialGradient></defs>`;
+  let grid=''; for(let x=0;x<=400;x+=25) grid += `M${x} 0V330`; for(let y=0;y<=330;y+=25) grid += `M0 ${y}H400`;
+  bg += `<path d="${grid}" stroke="rgba(127,166,255,${.28*(1-ak)})" stroke-width="1"/>`;
+  if(k>0) bg += `<circle cx="${cx}" cy="${cy}" r="160" fill="url(#sph)" opacity="${ak}"/><ellipse cx="${cx}" cy="${cy}" rx="160" ry="40" fill="none" stroke="rgba(169,194,255,${.35*ak})"/><ellipse cx="${cx}" cy="${cy}" rx="55" ry="160" fill="none" stroke="rgba(169,194,255,${.25*ak})"/>`;
+  if(k<0){ let sp=''; for(let j=-3;j<=3;j++){ const y = cy + j*42; sp += `M0 ${y} Q200 ${y + 70 - Math.abs(j)*8} 400 ${y}`; }
+    for(let j=-2;j<=2;j++){ const x = cx + j*70; sp += `M${x} 0 Q${x - j*28} ${cy} ${x} 330`; }
+    bg += `<path d="${sp}" fill="none" stroke="rgba(224,80,107,${.45*ak})" stroke-width="1.2"/>`; }
+  const col = k>0.02 ? '#f2c94c' : k<-0.02 ? '#ff7a93' : '#7fa6ff';
+  let angles = '';
+  const names = ['A','B','C'];
+  for(let i=0;i<3;i++){
+    const v = V[i], c1 = ctrl[i], c2 = ctrl[(i+2)%3];
+    const d1 = [c1[0]-v[0], c1[1]-v[1]], d2 = [c2[0]-v[0], c2[1]-v[1]];
+    const n1 = Math.hypot(...d1), n2 = Math.hypot(...d2), r = 22;
+    const p1 = [v[0]+d1[0]/n1*r, v[1]+d1[1]/n1*r], p2 = [v[0]+d2[0]/n2*r, v[1]+d2[1]/n2*r];
+    const cross = d1[0]*d2[1]-d1[1]*d2[0];
+    angles += `<path d="M${p1} A${r} ${r} 0 0 ${cross>0?1:0} ${p2}" fill="none" stroke="#fff" stroke-width="1.6"/>`;
+    const bis = [d1[0]/n1+d2[0]/n2, d1[1]/n1+d2[1]/n2], bl = Math.hypot(...bis)||1;
+    angles += `<text x="${v[0]+bis[0]/bl*44}" y="${v[1]+bis[1]/bl*44+4}" text-anchor="middle" font-size="12.5" font-weight="700" fill="#fff">${f(each)}°</text>`;
+    const out = [v[0]-cx, v[1]-cy], ol = Math.hypot(...out);
+    angles += `<text x="${v[0]+out[0]/ol*16}" y="${v[1]+out[1]/ol*16+5}" text-anchor="middle" font-size="14" font-weight="800" fill="${col}">${names[i]}</text>`;
+  }
+  $('#curvSvg').innerHTML = `<rect width="400" height="330" rx="14" fill="#070b22"/>` + bg +
+    `<path d="${tri}" fill="${col}" fill-opacity=".18" stroke="${col}" stroke-width="3" stroke-linejoin="round"/>` + angles +
+    `<text x="14" y="22" font-size="12" fill="#9ba5cc">${k>0.02?'Positive curvature: sides bulge, angles grow':k<-0.02?'Negative curvature: sides pinch, angles shrink':'Flat: straight sides, exactly 180°'}</text>`;
+  $('#sumOut').textContent = f(sum)+'°';
+  $('#eachOut').textContent = f(each)+'°';
+  $('#excOut').textContent = (e>=0?'+':'−')+f(Math.abs(e))+'°';
+  $('#kName').textContent = k>0.02 ? `Sphere-like (K = +${f(k,2)})` : k<-0.02 ? `Saddle-like (K = −${f(-k,2)})` : 'Flat (K = 0)';
+  $('#sName').textContent = s<.35 ? 'Small' : s<.7 ? 'Medium' : 'Large';
+  $$('#curvWidget .seg button').forEach(bn => bn.classList.toggle('on', +bn.dataset.k === +kS.value));
+}
+kS.addEventListener('input', drawCurv); sS.addEventListener('input', drawCurv);
+$$('#curvWidget .seg button').forEach(bn => bn.onclick = () => { kS.value = bn.dataset.k; drawCurv(); });
+
+/* ---------- globe octant ---------- */
+(function(){
+  const cx=160, cy=160, R=120, tau=rad(24);
+  const pr = (lat,lon) => { lat=rad(lat); lon=rad(lon); const x=Math.cos(lat)*Math.sin(lon), y=Math.sin(lat), z=Math.cos(lat)*Math.cos(lon);
+    const y2 = y*Math.cos(tau) - z*Math.sin(tau), z2 = z*Math.cos(tau) + y*Math.sin(tau); return [cx+R*x, cy-R*y2, z2]; };
+  const line = (pts, st) => `<path d="${pathFrom(pts.map(p=>[p[0],p[1]]),false)}" fill="none" ${st}/>`;
+  let s = `<defs><radialGradient id="glb" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#2a4bd0"/><stop offset="1" stop-color="#0a1240"/></radialGradient></defs>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#glb)" stroke="#7fa6ff" stroke-width="1.2"/>`;
+  for(const lon of [-90,-60,-30,0,30,60,90]){ const pts=[]; for(let la=-90;la<=90;la+=3) pts.push(pr(la,lon)); s += line(pts.filter(p=>p[2]>=0), 'stroke="rgba(169,194,255,.18)"'); }
+  for(const la of [-60,-30,30,60]){ const pts=[]; for(let lo=-90;lo<=90;lo+=3) pts.push(pr(la,lo)); s += line(pts.filter(p=>p[2]>=0), 'stroke="rgba(169,194,255,.18)"'); }
+  const eq=[]; for(let lo=-90;lo<=90;lo+=2) eq.push(pr(0,lo)); s += line(eq,'stroke="rgba(169,194,255,.6)" stroke-width="1.4"');
+  const tri=[]; for(let la=0;la<=90;la+=2) tri.push(pr(la,-45)); for(let la=90;la>=0;la-=2) tri.push(pr(la,45)); for(let lo=45;lo>=-45;lo-=2) tri.push(pr(0,lo));
+  s += `<path d="${pathFrom(tri.map(p=>[p[0],p[1]]))}" fill="rgba(242,183,5,.28)" stroke="#f2c94c" stroke-width="2.6" stroke-linejoin="round"/>`;
+  const Np = pr(90,0), P1 = pr(0,-45), P2 = pr(0,45);
+  [[Np,'North Pole',0,-12],[P1,'P₁',-16,18],[P2,'P₂',16,18]].forEach(([p,t,dx,dy]) => s += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#fff"/><text x="${p[0]+dx}" y="${p[1]+dy}" fill="#fff" font-size="13" font-weight="700" text-anchor="middle">${t}</text>`);
+  s += `<text x="${Np[0]}" y="${Np[1]+30}" fill="#f2c94c" font-size="13" font-weight="800" text-anchor="middle">90°</text>`;
+  s += `<text x="${P1[0]+20}" y="${P1[1]-8}" fill="#f2c94c" font-size="13" font-weight="800">90°</text>`;
+  s += `<text x="${P2[0]-46}" y="${P2[1]-8}" fill="#f2c94c" font-size="13" font-weight="800">90°</text>`;
+  s += `<text x="${cx}" y="292" fill="#9ba5cc" font-size="12" text-anchor="middle">Equator · 90° of longitude apart</text>`;
+  $('#globeSvg').innerHTML = s;
+})();
+
+/* ---------- CMB triangle ---------- */
+(function(){
+  const O = [200,300], E1 = [160,62], E2 = [240,62];
+  const info = {
+    closed:{off:-70, txt:'<b>Closed (sphere-like):</b> light paths curve as they travel, so they reach us at a <b>wider</b> angle. The spot would look <b>bigger than 1°</b>.'},
+    flat:{off:0, txt:'<b>Flat:</b> light travels in straight lines. The spot looks about <b>1°</b> wide. <b>This is what Planck measured.</b>'},
+    open:{off:34, txt:'<b>Open (saddle-like):</b> light paths spread apart, so they reach us at a <b>narrower</b> angle. The spot would look <b>smaller than 1°</b>.'}
+  };
+  function draw(m){
+    const o = info[m].off;
+    const c1 = [(E1[0]+O[0])/2 + o, (E1[1]+O[1])/2], c2 = [(E2[0]+O[0])/2 - o, (E2[1]+O[1])/2];
+    // apparent direction at observer = tangent O→control; extend to y=62
+    const ext = c => { const d=[c[0]-O[0], c[1]-O[1]], t=(62-O[1])/d[1]; return [O[0]+d[0]*t, 62]; };
+    const a1 = ext(c1), a2 = ext(c2);
+    let s = `<rect width="400" height="330" rx="14" fill="#070b22"/>`;
+    s += `<path d="M10 40 Q200 10 390 40 L390 84 Q200 54 10 84Z" fill="rgba(224,120,80,.18)"/>`;
+    for(let i=0;i<40;i++){ const x=20+i*9.3, y=40+((i*37)%30); s += `<circle cx="${x}" cy="${y}" r="${3+(i*13%5)}" fill="${i%3?'rgba(255,140,90,.35)':'rgba(120,170,255,.35)'}"/>`; }
+    s += `<text x="200" y="104" fill="#ffb38a" font-size="12" text-anchor="middle">Cosmic microwave background (≈ 13.8 billion years ago)</text>`;
+    s += `<ellipse cx="200" cy="62" rx="40" ry="11" fill="rgba(255,120,80,.75)" stroke="#ffd2b3"/>`;
+    s += `<text x="200" y="66" fill="#fff" font-size="10.5" text-anchor="middle" font-weight="700">known size</text>`;
+    if(m!=='flat'){
+      s += `<line x1="${O[0]}" y1="${O[1]}" x2="${a1[0]}" y2="${a1[1]}" stroke="#9ba5cc" stroke-dasharray="4 4"/><line x1="${O[0]}" y1="${O[1]}" x2="${a2[0]}" y2="${a2[1]}" stroke="#9ba5cc" stroke-dasharray="4 4"/>`;
+      s += `<ellipse cx="200" cy="62" rx="${Math.abs(a2[0]-a1[0])/2}" ry="12" fill="none" stroke="#fff" stroke-dasharray="3 3"/>`;
+      s += `<text x="200" y="28" fill="#fff" font-size="11" text-anchor="middle">apparent size (what we would see)</text>`;
+    }
+    const col = m==='closed' ? '#f2c94c' : m==='open' ? '#ff7a93' : '#7fa6ff';
+    s += `<path d="M${E1} Q${c1} ${O}" fill="none" stroke="${col}" stroke-width="2.6"/><path d="M${E2} Q${c2} ${O}" fill="none" stroke="${col}" stroke-width="2.6"/>`;
+    const r = 34, d1=[c1[0]-O[0],c1[1]-O[1]], d2=[c2[0]-O[0],c2[1]-O[1]], n1=Math.hypot(...d1), n2=Math.hypot(...d2);
+    s += `<path d="M${O[0]+d1[0]/n1*r} ${O[1]+d1[1]/n1*r} A${r} ${r} 0 0 1 ${O[0]+d2[0]/n2*r} ${O[1]+d2[1]/n2*r}" fill="none" stroke="#fff" stroke-width="1.6"/>`;
+    const ang = deg(Math.acos((d1[0]*d2[0]+d1[1]*d2[1])/(n1*n2)));
+    const flatAng = deg(Math.acos(((E1[0]-O[0])*(E2[0]-O[0])+(E1[1]-O[1])**2)/(Math.hypot(E1[0]-O[0],E1[1]-O[1])**2)));
+    s += `<text x="${O[0]}" y="${O[1]-42}" fill="#fff" font-size="13" font-weight="800" text-anchor="middle">${m==='flat'?'≈ 1°':m==='closed'?'> 1°':'< 1°'}</text>`;
+    s += `<circle cx="${O[0]}" cy="${O[1]}" r="6" fill="#7fa6ff"/><text x="${O[0]+12}" y="${O[1]+4}" fill="#e7ebff" font-size="12" font-weight="700">Us (Earth)</text>`;
+    s += `<text x="16" y="318" fill="#9ba5cc" font-size="10.5">Not to scale · angle ×${f(ang/flatAng,2)} the flat-space value</text>`;
+    $('#cmbSvg').innerHTML = s;
+    $('#cmbText').innerHTML = info[m].txt;
+    $$('#cmbSeg button').forEach(b => b.classList.toggle('on', b.dataset.m===m));
+  }
+  $$('#cmbSeg button').forEach(b => b.onclick = () => draw(b.dataset.m));
+  draw('flat');
+})();
+
+/* ---------- Results table ---------- */
+(function(){
+  const rows = [
+    {id:'flat', name:'Flat paper', pred:'= 180°'},
+    {id:'ball', name:'Ball (sphere)', pred:'> 180°'},
+    {id:'pringle', name:'Pringle (saddle)', pred:'< 180°'}
+  ];
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem('tt-measure')||'{}') || {}; } catch(e){ saved = {}; }
+  const body = $('#resBody');
+  body.innerHTML = rows.map(r => {
+    const base = ROJAN_MEASUREMENTS[r.id] || [];
+    const val = j => { const v = (saved[r.id]||[])[j]; return v!=null && v!=='' ? v : (base[j]!=null ? base[j] : ''); };
+    return `<tr data-id="${r.id}"><td><b>${r.name}</b></td><td>${r.pred}</td>` +
+      [0,1,2].map(j => `<td><input type="number" step="0.5" min="0" max="360" placeholder="__°" value="${val(j)}" aria-label="${r.name} angle ${'ABC'[j]}"></td>`).join('') +
+      `<td class="num sum">—</td><td class="verdict">—</td></tr>`;
+  }).join('');
+  function update(){
+    const store = {};
+    $$('#resBody tr').forEach(tr => {
+      const ins = Array.from(tr.querySelectorAll('input')), vals = ins.map(i => i.value);
+      store[tr.dataset.id] = vals;
+      const nums = vals.map(parseFloat);
+      const sumEl = tr.querySelector('.sum'), vEl = tr.querySelector('.verdict');
+      if(nums.every(n => !isNaN(n))){
+        const sum = nums.reduce((a,b)=>a+b,0); sumEl.textContent = f(sum)+'°';
+        if(Math.abs(sum-180) <= 3){ vEl.textContent = '= 180° (flat)'; vEl.className='verdict v-eq'; }
+        else if(sum > 180){ vEl.textContent = '> 180° (+'+f(sum-180)+'°)'; vEl.className='verdict v-gt'; }
+        else { vEl.textContent = '< 180° (−'+f(180-sum)+'°)'; vEl.className='verdict v-lt'; }
+      } else { sumEl.textContent='—'; vEl.textContent='—'; vEl.className='verdict'; }
+    });
+    try { localStorage.setItem('tt-measure', JSON.stringify(store)); } catch(e){}
+  }
+  body.addEventListener('input', update); update();
+})();
+
+/* =========================================================
+   CONNECTION: FLAG IN CURVED SPACE
+   ========================================================= */
+(function(){
+  const slider = $('#warpK'), svg = $('#warpSvg');
+  const cen = [.52,.68], SC = 250, OX = 200, OY = 200;
+  const dens = (pts, n=14) => { const out=[]; for(let i=0;i<pts.length;i++){ const a=pts[i], b=pts[(i+1)%pts.length];
+      for(let k=0;k<n;k++) out.push([a[0]+(b[0]-a[0])*k/n, a[1]+(b[1]-a[1])*k/n]); } return out; };
+  const shapes = [
+    {pts:dens(N.outer,30), fill:'#003893'}, {pts:dens(N.inner,30), fill:'#DC143C'},
+    {pts:N.crescent, fill:'#fff'}, {pts:dens(N.moonFace,2), fill:'#fff'},
+    ...N.moonRays.map(t=>({pts:dens(t,4), fill:'#fff'})),
+    {pts:N.sunDisk, fill:'#fff'}, ...N.sunRays.map(t=>({pts:dens(t,4), fill:'#fff'}))
+  ];
+  const triABD = dens([N.P.A,N.P.B,N.P.D],30);
+  function draw(){
+    const k = +slider.value/100, ak = Math.abs(k), Rs = ak>0.01 ? .72/ak : Infinity;
+    const rmax = .95, hs = k<-0.01 ? rmax/(Rs*Math.sinh(rmax/Rs)) : 1;
+    const warp = p => { const dx=p[0]-cen[0], dy=p[1]-cen[1], r=Math.hypot(dx,dy); if(r<1e-9 || ak<=0.01) return [OX+dx*SC, OY-dy*SC];
+      const r2 = k>0 ? Rs*Math.sin(Math.min(r/Rs, Math.PI/2)) : hs*Rs*Math.sinh(r/Rs); const s = r2/r; return [OX+dx*s*SC, OY-dy*s*SC]; };
+    let s = `<defs><radialGradient id="ball" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9cbe0"/></radialGradient></defs>`;
+    s += `<rect width="400" height="400" rx="14" fill="#f7f6fb"/>`;
+    if(k>0.01) s += `<circle cx="${OX}" cy="${OY}" r="${Rs*SC}" fill="url(#ball)" stroke="#b9bbd4" opacity="${Math.min(1,ak*1.5)}"/>`;
+    if(k<-0.01){ let sp=''; for(let j=-4;j<=4;j++){ const y=OY+j*45; sp += `M0 ${y} Q200 ${y+(j===0?0:-Math.sign(j))*60*ak} 400 ${y}`; } s += `<path d="${sp}" fill="none" stroke="rgba(90,63,192,${.35*ak})"/>`; }
+    shapes.forEach(sh => s += `<path d="${pathFrom(sh.pts.map(warp))}" fill="${sh.fill}"/>`);
+    s += `<path d="${pathFrom(triABD.map(warp))}" fill="none" stroke="#f2b705" stroke-width="2.2" stroke-dasharray="6 4"/>`;
+    [['A',N.P.A,-14,14],['B',N.P.B,6,14],['D',N.P.D,-16,4]].forEach(([t,p,dx,dy]) => { const w = warp(p); s += `<text x="${w[0]+dx}" y="${w[1]+dy}" font-size="13" font-weight="800" fill="#1a1d27">${t}</text>`; });
+    svg.innerHTML = s;
+    const excess = (k>0.01 ? 1 : k<-0.01 ? -1 : 0) * 0.5/(Rs*Rs);   // K·Area, Area(ABD) = 1/2
+    const sum = 180 + (isFinite(excess)?deg(excess):0);
+    $('#warpSum').textContent = f(sum)+'°';
+    $('#warpName').textContent = k>0.01 ? 'Ball (K > 0)' : k<-0.01 ? 'Saddle (K < 0)' : 'Flat';
+    $('#warpOk').textContent = ak<=0.01 ? 'Works exactly' : k>0 ? 'Parallels meet: distorted' : 'Parallels spread: distorted';
+  }
+  slider.addEventListener('input', draw); draw();
+})();
+
+/* ---------- start ---------- */
+route();
+})();
+</script>
+</body>
+</html>
